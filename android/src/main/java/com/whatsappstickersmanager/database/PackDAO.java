@@ -16,7 +16,6 @@ import static com.whatsappstickersmanager.Const.Pack.COL_VERSION;
 import static com.whatsappstickersmanager.Const.Sticker.COL_EMOJIS;
 import static com.whatsappstickersmanager.Const.Sticker.COL_IMAGE_FILE;
 import static com.whatsappstickersmanager.Const.Sticker.COL_STICKER_ID;
-import static com.whatsappstickersmanager.WhatsappStickersManagerModule.STICKER_ASSET_PATH;
 import static com.whatsappstickersmanager.database.DatabaseHelper.TABLE_NAME_PACKS;
 import static com.whatsappstickersmanager.database.DatabaseHelper.TABLE_NAME_STICKERS;
 
@@ -26,20 +25,24 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.bridge.WritableNativeMap;
 import com.whatsappstickersmanager.Const;
+import com.whatsappstickersmanager.DataConverter;
 
 import java.util.List;
 
-public class PackDAO implements iPackDAO {
+public class PackDAO implements PackManager {
     String TAG = PackDAO.class.getSimpleName();
-    private DatabaseHelper helper;
+    private final DatabaseHelper helper;
 
+    private Context context;
     public PackDAO(Context context) {
+        this.context = context;
         helper = new DatabaseHelper(context);
     }
 
@@ -64,7 +67,19 @@ public class PackDAO implements iPackDAO {
     }
 
     @Override
-    public WritableArray getPacks() {
+    public int deletePack(long identifier) {
+        try (SQLiteDatabase db = helper.getWritableDatabase()) {
+            String selection = COL_IDENTIFIER + "=?";
+            String[] selectionArgs = new String[]{String.valueOf(identifier)};
+            return db.delete(TABLE_NAME_PACKS, selection, selectionArgs);
+        } catch (Exception e) {
+            Log.e(TAG, "Error at PackDAO.deletePack: "+ e.toString());
+            return -1;
+        }
+    }
+
+    @Override
+    public WritableArray getPacksALL() {
         try (SQLiteDatabase db = helper.getReadableDatabase()) {
 
             // cursor for all rows, columns in the packs table
@@ -80,14 +95,17 @@ public class PackDAO implements iPackDAO {
                 do {
                     // get the identifier of the pack for extracting the stickers
                     int identifier = cursor.getInt(cursor.getColumnIndex(COL_IDENTIFIER));
-                    Log.v(TAG, "real identifier: " + identifier);
 
                     // get the pack data
-                    WritableMap pack =  extractPack(cursor);
+//                    WritableMap pack =  extractPack(cursor);
+                    WritableMap pack =  DataConverter.convertCursor2MapForPack(cursor);
+
                     // get the stickers for the current pack
-                    WritableArray stickersArray = extractStickers(db, identifier);
+                    WritableArray stickersArray = DataConverter.convertCursor2ArrayForSticker(db, identifier);
+
                     // put the stickers in the pack
                     if(stickersArray != null) pack.putArray(Const.Pack.COL_STICKERS, stickersArray);
+
                     // add the pack to the array
                     packs.pushMap(pack);
                 } while (cursor.moveToNext());
@@ -98,93 +116,64 @@ public class PackDAO implements iPackDAO {
         }
     }
 
-    private WritableArray extractStickers(SQLiteDatabase db, int identifier) {
-        try{
-            WritableArray stickers = new WritableNativeArray();
+    @Override
+    public int deletePackALL() {
 
+        try (SQLiteDatabase db = helper.getWritableDatabase()) {
+            return db.delete(TABLE_NAME_PACKS, null, null);
+        }
+
+    }
+
+    @Override
+    public WritableMap getPack(int identifier) {
+        try (SQLiteDatabase db = helper.getReadableDatabase()) {
             String selection = COL_IDENTIFIER + "=?";
             String[] selectionArgs = new String[]{String.valueOf(identifier)};
-            Cursor cursor =  db.query(TABLE_NAME_STICKERS, null, selection, selectionArgs, null, null, null, null);
+            Cursor cursor = db.query(TABLE_NAME_PACKS, null, selection, selectionArgs, null, null, null);
 
-            if (cursor != null && cursor.moveToFirst()) {
-                do {
-                    WritableMap stickerMap = new WritableNativeMap();
+            if (cursor!= null && cursor.moveToFirst()) { // Check if cursor is not null and move to first row
+                WritableMap pack = DataConverter.convertCursor2MapForPack(cursor);
 
-                    String emojisString = cursor.getString(cursor.getColumnIndex(COL_EMOJIS));
-                    WritableArray emojis = convertEmojis2Array(emojisString);
+                // get the stickers for the current pack
+                WritableArray stickersArray = DataConverter.convertCursor2ArrayForSticker(db, identifier);
 
-                    stickerMap.putInt(COL_STICKER_ID, cursor.getInt(cursor.getColumnIndex(COL_STICKER_ID)));
-                    stickerMap.putInt(COL_IDENTIFIER, identifier);
-                    stickerMap.putString(COL_IMAGE_FILE, cursor.getString(cursor.getColumnIndex(COL_IMAGE_FILE)));
-                    stickerMap.putArray(COL_EMOJIS, emojis);
+                pack.putArray(Const.Pack.COL_STICKERS, stickersArray);
 
-                    stickers.pushMap(stickerMap);
-                } while (cursor.moveToNext());
+                return pack;
+            } else {
+                return null; // Return null if cursor is null or empty
             }
-
-            if (cursor != null) cursor.close();
-            return stickers;
-        }catch (Exception e){
-            Log.v(TAG, "Error at PackDAO.extractStickers: "+ e.toString());
+        }catch ( Exception e ) {
+            Log.e(TAG, "Error at PackDAO.getPack: "+ e.toString());
             return null;
-//            throw new RuntimeException("Error at PackDAO.extractStickers: "+ e.getMessage());
         }
     }
 
-    private ReadableMap extractSticker(Cursor cursor) {
-        try{
-            WritableMap stickerMap = new WritableNativeMap();
+    @Override
+    public int updatePack(int identifier, ContentValues values) {
+        try (SQLiteDatabase db = helper.getWritableDatabase()) {
+            if (!values.isEmpty()) {
+                String whereClause = COL_IDENTIFIER + "=?";
+                String[] whereArgs = new String[]{String.valueOf(identifier)};
 
-            int stickerID = cursor.getInt(cursor.getColumnIndex(COL_STICKER_ID));
-            String identifier = cursor.getString(cursor.getColumnIndex(COL_IDENTIFIER));
-            String imageFile = cursor.getString(cursor.getColumnIndex(COL_IMAGE_FILE));
-            String emojisString = cursor.getString(cursor.getColumnIndex(COL_EMOJIS));
+                db.update(TABLE_NAME_PACKS, values, whereClause, whereArgs);
+            }
+        }
+        return 0;
+    }
 
-            WritableArray emojis = convertEmojis2Array(emojisString);
+    @Override
+    public int updateTrayIcon(int identifier, ContentValues values) {
 
-            stickerMap.putString(COL_STICKER_ID, String.valueOf(stickerID));
-            stickerMap.putString(COL_IDENTIFIER, identifier);
-            stickerMap.putString(COL_IMAGE_FILE, imageFile);
-            stickerMap.putArray(COL_EMOJIS, emojis);
-
-            return stickerMap;
-        }catch (Exception e){
-            throw new RuntimeException("Error at PackDAO.extractSticker: "+ e.getMessage());
+        try (SQLiteDatabase db = helper.getWritableDatabase()) {
+            String whereClause = COL_IDENTIFIER + "=?";
+            String[] whereArgs = new String[]{String.valueOf(identifier)};
+            return db.update(TABLE_NAME_PACKS, values, whereClause, whereArgs);
+        }catch ( Exception e ) {
+            Log.e(TAG, "Error at PackDAO.updateTrayIcon: "+ e.toString());
+            return -1;
         }
     }
 
-    private WritableArray convertEmojis2Array(String emojisString) {
-        String[] emojisArray = emojisString.split(",");
-        WritableArray emojisWritableArray = new WritableNativeArray();
-        for (String emoji : emojisArray) {
-            emojisWritableArray.pushString(emoji);
-        }
-        return emojisWritableArray;
-    }
-
-    private WritableMap extractPack(Cursor cursor) {
-        try{
-            WritableMap packMap = new WritableNativeMap();
-            // priority 1
-            packMap.putInt(COL_IDENTIFIER, cursor.getInt(cursor.getColumnIndex(COL_IDENTIFIER)));
-            packMap.putString(COL_NAME, cursor.getString(cursor.getColumnIndex(COL_NAME)));
-            packMap.putString(COL_PUBLISHER, cursor.getString(cursor.getColumnIndex(COL_PUBLISHER)));
-            packMap.putString(COL_TRAY, cursor.getString(cursor.getColumnIndex(COL_TRAY)));
-            packMap.putString(COL_VERSION, cursor.getString(cursor.getColumnIndex(COL_VERSION)));
-            packMap.putBoolean(COL_ANIMATED, 1 == cursor.getInt(cursor.getColumnIndex(COL_ANIMATED)));
-            packMap.putBoolean(COL_AVOID_CACHE, 1 == cursor.getInt(cursor.getColumnIndex(COL_AVOID_CACHE)));
-
-            // priority 2
-            packMap.putString(COL_ANDROID, cursor.getString(cursor.getColumnIndex(COL_ANDROID)));
-            packMap.putString(COL_IOS, cursor.getString(cursor.getColumnIndex(COL_IOS)));
-            packMap.putString(COL_PRIVACY, cursor.getString(cursor.getColumnIndex(COL_PRIVACY)));
-            packMap.putString(COL_LICENSE, cursor.getString(cursor.getColumnIndex(COL_LICENSE)));
-            packMap.putString(COL_PUB_LINK, cursor.getString(cursor.getColumnIndex(COL_PUB_LINK)));
-            packMap.putString(COL_PUB_EMAIL, cursor.getString(cursor.getColumnIndex(COL_PUB_EMAIL)));
-
-            return packMap;
-        }catch ( Exception e){
-            throw new RuntimeException("Error at PackDAO.extractPack: "+ e.getMessage());
-        }
-    }
 }
