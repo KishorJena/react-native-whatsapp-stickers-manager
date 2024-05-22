@@ -41,14 +41,14 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/KishorJena/KishorJena/react-native-whatsapp-stickers-manager.git"
+    "url": "git+https://github.com/KishorJena/react-native-whatsapp-stickers-manager.git"
   },
   "author": "Kishor Jena <ksr,jena@gmail.com> (https://github.com/KishorJena/KishorJena)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/KishorJena/KishorJena/react-native-whatsapp-stickers-manager/issues"
+    "url": "https://github.com/KishorJena/react-native-whatsapp-stickers-manager/issues"
   },
-  "homepage": "https://github.com/KishorJena/KishorJena/react-native-whatsapp-stickers-manager#readme",
+  "homepage": "https://github.com/KishorJena/react-native-whatsapp-stickers-manager#readme",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
