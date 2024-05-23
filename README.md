@@ -2,6 +2,9 @@
 
 Dynamic stickers manager for Whatsapp..
 
+TODO:
+[] ise transaction in DB operations
+
 ## Installation
 
 ```sh

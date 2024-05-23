@@ -1,6 +1,6 @@
 {
   "name": "react-native-whatsapp-stickers-manager",
-  "version": "0.1.0",
+  "version": "0.1.1-alpha.0",
   "description": "Dynamic stickers manager for Whatsapp",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
@@ -26,11 +26,10 @@
     "!**/.*"
   ],
   "scripts": {
-    "example": "yarn workspace react-native-whatsapp-stickers-manager-example",
     "test": "jest",
     "typecheck": "tsc --noEmit",
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
-    "clean": "del-cli android/build example/android/build example/android/app/build example/ios/build lib",
+    "clean": "del-cli android/build",
     "prepare": "bob build",
     "release": "release-it"
   },
