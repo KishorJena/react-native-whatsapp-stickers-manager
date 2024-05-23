@@ -22,4 +22,6 @@ public interface PackManager {
     int updatePack(int identifier, ContentValues values);
 
     int updateTrayIcon(int identifier,  ContentValues values);
+
+    int updateVersion(int identifier);
 }

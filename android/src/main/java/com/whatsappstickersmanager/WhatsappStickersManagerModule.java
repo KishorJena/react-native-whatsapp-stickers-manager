@@ -5,6 +5,7 @@ import static com.whatsappstickersmanager.Const.Pack.COL_STICKERS;
 import static com.whatsappstickersmanager.Const.Pack.COL_TRAY;
 import static com.whatsappstickersmanager.Const.Sticker.COL_EMOJIS;
 import static com.whatsappstickersmanager.Const.Sticker.COL_IMAGE_FILE;
+import static com.whatsappstickersmanager.Const.Sticker.COL_STICKER_ID;
 
 import android.app.Activity;
 import android.content.ContentValues;
@@ -24,9 +25,11 @@ import com.facebook.react.bridge.WritableMap;
 import com.whatsappstickersmanager.database.PackDAO;
 import com.whatsappstickersmanager.database.StickerDAO;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class WhatsappStickersManagerModule extends com.whatsappstickersmanager.WhatsappStickersManagerSpec implements ActivityEventListener {
   String TAG = WhatsappStickersManagerModule.class.getSimpleName();
@@ -113,6 +116,7 @@ public class WhatsappStickersManagerModule extends com.whatsappstickersmanager.W
       try {
         PackDAO packDAO = new PackDAO(context);
         int rowDeleted = packDAO.deletePack(identifer);
+        FileActions.deleteDirectory(new File(STICKER_ASSET_PATH+"/"+identifer));
         promise.resolve(rowDeleted);
       }catch (Exception e){
         promise.reject(e);
@@ -125,6 +129,7 @@ public class WhatsappStickersManagerModule extends com.whatsappstickersmanager.W
     try {
       PackDAO packDAO = new PackDAO(context);
       int rowDeleted = packDAO.deletePackALL();
+      FileActions.emptyDirectory(new File(STICKER_ASSET_PATH));
       promise.resolve(rowDeleted);
     }catch (Exception e){
       promise.reject(e);
@@ -143,31 +148,30 @@ public class WhatsappStickersManagerModule extends com.whatsappstickersmanager.W
     }
   }
 
-  @ReactMethod
-  public void updateTrayIcon(int identifier, String iconPath, Promise promise) {
-    try {
-      ContentValues values = new ContentValues();
-      values.put(COL_TRAY, iconPath);
+  @Override
+  public void updateTrayIcon(ReadableMap option, String sourceFilePath, Promise promise) {
 
-      PackDAO packDAO = new PackDAO(context);
-      int rowUpdated = packDAO.updateTrayIcon(identifier, values);
-      promise.resolve(rowUpdated);
-    }catch ( Exception e ){
-      promise.resolve(e);
-    }
   }
 
-  @ReactMethod
-  public void insertStickerToPack(int identifier, String stickerPath, Promise promise) {
+  @ReactMethod // ✅
+  public void insertStickerToPack(String stickerPath, int identifier, Promise promise) {
 
     try {
+      String destinationFileName = UUID.randomUUID().toString() + ".webp";
+
       ContentValues values = new ContentValues();
-      values.put(COL_IMAGE_FILE, stickerPath);
+      values.put(COL_IMAGE_FILE, destinationFileName);
       values.put(COL_EMOJIS, "♻️,🖼️");
       values.put(COL_IDENTIFIER, identifier);
 
       StickerDAO stickerDAO = new StickerDAO(context);
       int rowUpdated = (int) stickerDAO.insertSticker(identifier, values);
+
+      new PackDAO(context).updateVersion(identifier);
+
+      // Save file
+      FileActions.SaveImage(stickerPath, destinationFileName, identifier);
+
       promise.resolve(rowUpdated);
     }catch ( Exception e ){
       promise.resolve(e);
@@ -175,26 +179,68 @@ public class WhatsappStickersManagerModule extends com.whatsappstickersmanager.W
 
   }
 
-  @ReactMethod
-  public void removeStickerFromPack(int identifier, int stickerId, Promise promise) {
+  @ReactMethod // ✅
+  public void removeStickerFromPack(ReadableMap option, Promise promise) {
+    int identifier = option.getInt(COL_IDENTIFIER);
+    int stickerId = option.getInt(COL_STICKER_ID);
+    String fileName = option.getString(COL_IMAGE_FILE);
+
     try{
       StickerDAO stickerDAO = new StickerDAO(context);
       int rowDeleted = stickerDAO.deleteSticker(identifier, stickerId);
+      FileActions.deleteFile(new File(STICKER_ASSET_PATH+"/"+identifier+"/"+fileName));
       promise.resolve(rowDeleted);
     }catch (Exception e){
       promise.reject(e);
     }
   }
+  
 
   @ReactMethod
-  public void updateSticker(int identifier, int stickerId, String stickerPath, Promise promise) {
+  public void updateSticker(int identifier,int sticker_id, String sourceFilePath, Promise promise) {
+
     try {
+      StickerDAO stickerDAO = new StickerDAO(context);
+      String image_file = stickerDAO.getStickerName(identifier,sticker_id);
+      String targetFileName = UUID.randomUUID().toString() + ".webp";
+
+      // DB
       ContentValues values = new ContentValues();
-      values.put(COL_IMAGE_FILE, stickerPath);
+      values.put(COL_IMAGE_FILE, targetFileName);
       values.put(COL_EMOJIS, "♻️,🖼️");
       values.put(COL_IDENTIFIER, identifier);
-      StickerDAO stickerDAO = new StickerDAO(context);
-      int rowUpdated = stickerDAO.updateSticker(identifier, stickerId, values);
+
+      int rowUpdated = stickerDAO.updateSticker(identifier, sticker_id, values);
+      new PackDAO(context).updateVersion(identifier);
+
+      // File
+      FileActions.SaveImage(sourceFilePath, targetFileName, identifier);
+      FileActions.deleteFile(new File(image_file));
+      promise.resolve(rowUpdated);
+    }catch ( Exception e ){
+      promise.resolve(e);
+    }
+  }
+  @ReactMethod
+  public void updateTrayIcon(int identifier, String sourceFilePath, Promise promise) {
+
+    try {
+      PackDAO packDAO = new PackDAO(context);
+
+      String targetFileName = UUID.randomUUID().toString() + ".webp";
+
+      ContentValues values = new ContentValues();
+      values.put(COL_TRAY, targetFileName);
+
+      int rowUpdated = packDAO.updateTrayIcon(identifier, values);
+
+      // File
+      FileActions.SaveImage(sourceFilePath, targetFileName, identifier);
+
+      // delete existing tray
+      String existingTrayPath = packDAO.getTrayImageFilePath(identifier);
+      FileActions.deleteFile(new File(existingTrayPath));
+
       promise.resolve(rowUpdated);
     }catch ( Exception e ){
       promise.resolve(e);

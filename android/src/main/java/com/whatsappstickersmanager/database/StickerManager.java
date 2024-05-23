@@ -4,7 +4,6 @@ import android.content.ContentValues;
 
 public interface StickerManager {
     long insertSticker(int identifier, ContentValues values);
-    int updateSticker(int identifier, ContentValues values);
 
     int deleteSticker(int identifier, int stickerId);
 

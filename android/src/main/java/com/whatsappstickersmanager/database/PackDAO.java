@@ -1,6 +1,8 @@
 package com.whatsappstickersmanager.database;
 
 import static com.whatsappstickersmanager.Const.Pack.COL_IDENTIFIER;
+import static com.whatsappstickersmanager.Const.Pack.COL_TRAY;
+import static com.whatsappstickersmanager.Const.Pack.COL_VERSION;
 import static com.whatsappstickersmanager.database.DatabaseHelper.TABLE_NAME_PACKS;
 import static com.whatsappstickersmanager.database.DatabaseHelper.TABLE_NAME_STICKERS;
 
@@ -77,8 +79,6 @@ public class PackDAO implements PackManager {
             // init the array to return
             WritableArray packs = new WritableNativeArray();
 
-
-            packs.pushString("packs");
             if (cursor.moveToFirst()) {
                 do {
                     // get the identifier of the pack for extracting the stickers
@@ -161,6 +161,62 @@ public class PackDAO implements PackManager {
         }catch ( Exception e ) {
             Log.e(TAG, "Error at PackDAO.updateTrayIcon: "+ e.toString());
             return -1;
+        }
+    }
+
+    @Override
+    public int updateVersion(int identifier) {
+        try (SQLiteDatabase db = helper.getWritableDatabase()) {
+            // Get the current version for the specified pack
+            String[] columns = new String[]{COL_VERSION};
+            String selection = COL_IDENTIFIER + " =?";
+            String[] selectionArgs = new String[]{String.valueOf(identifier)};
+
+            Cursor cursor = db.query(TABLE_NAME_PACKS, columns, selection, selectionArgs, null, null, null);
+            cursor.moveToFirst();
+            String currentVersion = cursor.getString(0);
+            cursor.close();
+
+            // Increment the version number
+            int newVersionNumber = Integer.parseInt(currentVersion) + 1;
+            String newVersion = String.valueOf(newVersionNumber);
+
+            // Update the pack's version
+            ContentValues values = new ContentValues();
+            values.put(COL_VERSION, newVersion);
+
+            String whereClause = COL_IDENTIFIER + " =?";
+            String[] whereArgs = new String[]{String.valueOf(identifier)};
+            db.update(TABLE_NAME_PACKS, values, whereClause, whereArgs);
+
+            return newVersionNumber;
+        }catch ( Exception e ) {
+            Log.e(TAG, "Error at PackDAO.updateVersion: "+ e.toString());
+            return -1;
+        }
+    }
+
+
+    public String getTrayImageFilePath(int identifier) {
+        try (SQLiteDatabase db = helper.getReadableDatabase()){
+
+            String trayImageFilePath = null;
+            String [] cols = new String[]{COL_TRAY};
+            String selection = COL_IDENTIFIER + " = ?";
+            String[] selectionArgs = new String[]{String.valueOf(identifier)};
+
+            Cursor cursor = db.query(TABLE_NAME_PACKS, cols, selection, selectionArgs, null, null, null);
+
+            if (cursor.moveToFirst()) {
+                trayImageFilePath = cursor.getString(cursor.getColumnIndex(COL_TRAY));
+            }
+
+            cursor.close();
+
+            return trayImageFilePath;
+        }catch ( Exception e ){
+            Log.e(TAG, "Error at PackDAO.getTrayImageFilePath: "+ e.toString());
+            return null;
         }
     }
 

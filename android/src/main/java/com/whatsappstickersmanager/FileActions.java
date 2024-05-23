@@ -31,4 +31,33 @@ public class FileActions {
 
     }
 
+    public static void emptyDirectory(File directory) {
+        for (File f : directory.listFiles()) {
+            deleteDirectory(f);
+        }
+
+    }
+    public static void deleteDirectory(File directory) {
+        if (directory.isDirectory()) {
+            String[] children = directory.list();
+            for (int i = 0; i < children.length; i++) {
+                deleteDirectory(new File(directory, children[i]));
+            }
+        }
+        // Delete the directory (or file) whether it's empty or not
+        directory.delete();
+    }
+
+    public static void deleteDirectories(File... directories) {
+        for (File directory : directories) {
+            if (directory.exists()) {
+                deleteDirectory(directory);
+            }
+        }
+    }
+
+    public static boolean deleteFile(File file) {
+        return file.exists() && file.delete();
+    }
+
 }
