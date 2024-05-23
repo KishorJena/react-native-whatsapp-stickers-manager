@@ -1,6 +1,7 @@
 package com.whatsappstickersmanager;
 
 import static com.whatsappstickersmanager.Const.Pack.COL_IDENTIFIER;
+import static com.whatsappstickersmanager.Const.Pack.COL_STICKERS;
 import static com.whatsappstickersmanager.Const.Pack.COL_TRAY;
 import static com.whatsappstickersmanager.Const.Sticker.COL_EMOJIS;
 import static com.whatsappstickersmanager.Const.Sticker.COL_IMAGE_FILE;
@@ -23,7 +24,9 @@ import com.facebook.react.bridge.WritableMap;
 import com.whatsappstickersmanager.database.PackDAO;
 import com.whatsappstickersmanager.database.StickerDAO;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class WhatsappStickersManagerModule extends com.whatsappstickersmanager.WhatsappStickersManagerSpec implements ActivityEventListener {
   String TAG = WhatsappStickersManagerModule.class.getSimpleName();
@@ -53,19 +56,26 @@ public class WhatsappStickersManagerModule extends com.whatsappstickersmanager.W
 
   @ReactMethod
   public void createPack(ReadableMap packData, Promise promise) {
-    try{
-      ContentValues pack = DataConverter.map2ContentValues(packData);
-      Log.v(TAG,  "createPack pack "+ pack.get(Const.Pack.COL_IDENTIFIER));
+    // Create a map to store the original file names and their corresponding new random file names
+    Map<String, String> pathMap = new HashMap<>();
 
+    try{
+      // Insert Pack
+      ContentValues pack = DataConverter.map2content_pack(packData, pathMap);
       PackDAO packDAO = new PackDAO(context);
       int identifier = (int) packDAO.insertPack(pack);
-      // log the identifer
-      Log.v(TAG, "createPack success :identifer "+ identifier);
 
-      List<ContentValues> stickers = DataConverter.getStickers(packData, identifier);
-      packDAO.insertStickers(stickers);
+      // Insert Stickers
+      List<ContentValues> stickersContent = DataConverter.array2content_stickers(packData.getArray(COL_STICKERS), identifier, pathMap);
+      packDAO.insertStickers(stickersContent);
 
-      FileActions.copyFiles(packData, identifier);
+      // save tray and stickers into asset with identifier
+      for (Map.Entry<String, String> entry : pathMap.entrySet()) {
+        String sourcePath = entry.getKey();
+        String fileName = entry.getValue();
+        String createdFile = FileActions.SaveImage( sourcePath, fileName, identifier);
+        //TODO set result if file craeted or not ; createdFile
+      }
       promise.resolve("createPack success :identifer"+ identifier);
     }catch (Exception e){
       Log.v(TAG, "createPack error "+ e);
@@ -124,7 +134,7 @@ public class WhatsappStickersManagerModule extends com.whatsappstickersmanager.W
   @ReactMethod
   public void updatePackMeta(int identifier, ReadableMap fields, com.facebook.react.bridge.Promise promise) {
     try {
-      ContentValues pack = DataConverter.map2ContentValuesForFields(fields);
+      ContentValues pack = DataConverter.map2Content_option(fields);
       PackDAO packDAO = new PackDAO(context);
       int rowUpdated = packDAO.updatePack(identifier, pack);
       promise.resolve(rowUpdated);

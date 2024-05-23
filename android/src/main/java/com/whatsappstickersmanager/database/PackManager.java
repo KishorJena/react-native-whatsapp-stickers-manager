@@ -2,7 +2,6 @@ package com.whatsappstickersmanager.database;
 
 import android.content.ContentValues;
 
-import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 

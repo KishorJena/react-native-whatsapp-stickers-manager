@@ -1,21 +1,6 @@
 package com.whatsappstickersmanager.database;
 
-import static com.whatsappstickersmanager.Const.Pack.COL_ANDROID;
-import static com.whatsappstickersmanager.Const.Pack.COL_ANIMATED;
-import static com.whatsappstickersmanager.Const.Pack.COL_AVOID_CACHE;
 import static com.whatsappstickersmanager.Const.Pack.COL_IDENTIFIER;
-import static com.whatsappstickersmanager.Const.Pack.COL_IOS;
-import static com.whatsappstickersmanager.Const.Pack.COL_LICENSE;
-import static com.whatsappstickersmanager.Const.Pack.COL_NAME;
-import static com.whatsappstickersmanager.Const.Pack.COL_PRIVACY;
-import static com.whatsappstickersmanager.Const.Pack.COL_PUBLISHER;
-import static com.whatsappstickersmanager.Const.Pack.COL_PUB_EMAIL;
-import static com.whatsappstickersmanager.Const.Pack.COL_PUB_LINK;
-import static com.whatsappstickersmanager.Const.Pack.COL_TRAY;
-import static com.whatsappstickersmanager.Const.Pack.COL_VERSION;
-import static com.whatsappstickersmanager.Const.Sticker.COL_EMOJIS;
-import static com.whatsappstickersmanager.Const.Sticker.COL_IMAGE_FILE;
-import static com.whatsappstickersmanager.Const.Sticker.COL_STICKER_ID;
 import static com.whatsappstickersmanager.database.DatabaseHelper.TABLE_NAME_PACKS;
 import static com.whatsappstickersmanager.database.DatabaseHelper.TABLE_NAME_STICKERS;
 
@@ -25,12 +10,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import com.facebook.react.bridge.ReactApplicationContext;
-import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeArray;
-import com.facebook.react.bridge.WritableNativeMap;
 import com.whatsappstickersmanager.Const;
 import com.whatsappstickersmanager.DataConverter;
 
@@ -49,6 +31,7 @@ public class PackDAO implements PackManager {
     @Override
     public long insertPack(ContentValues values) {
         try(SQLiteDatabase db = helper.getWritableDatabase()) {
+            Log.v(TAG, "insertPack: " + values);
             return db.insert(TABLE_NAME_PACKS, null, values);
         } catch (Exception e) {
             throw new RuntimeException("Error at PackDAO.insertPack: "+ e.getMessage());
@@ -57,12 +40,17 @@ public class PackDAO implements PackManager {
 
     @Override
     public void insertStickers(List<ContentValues> stickers) {
+        Log.v(TAG, "insertSticker: stickers.size()" + stickers.size());
+
         try(SQLiteDatabase db = helper.getWritableDatabase()) {
             for (ContentValues sticker : stickers) {
-                db.insert(TABLE_NAME_STICKERS, null, sticker);
+                Log.v(TAG, "insertSticker: " + sticker.toString());
+                long id = db.insert(TABLE_NAME_STICKERS, null, sticker);
+                Log.v(TAG, "insertSticker: ID " + id);
+
             }
         } catch (Exception e) {
-            throw new RuntimeException("Error at PackDAO.insertPack: "+ e.getMessage());
+            Log.e(TAG, "Error at PackDAO.insertStickers: "+ e.toString());
         }
     }
 
@@ -98,10 +86,10 @@ public class PackDAO implements PackManager {
 
                     // get the pack data
 //                    WritableMap pack =  extractPack(cursor);
-                    WritableMap pack =  DataConverter.convertCursor2MapForPack(cursor);
+                    WritableMap pack =  DataConverter.cursor2map_pack(cursor);
 
                     // get the stickers for the current pack
-                    WritableArray stickersArray = DataConverter.convertCursor2ArrayForSticker(db, identifier);
+                    WritableArray stickersArray = DataConverter.cursor2array_stickers(db, identifier);
 
                     // put the stickers in the pack
                     if(stickersArray != null) pack.putArray(Const.Pack.COL_STICKERS, stickersArray);
@@ -133,10 +121,10 @@ public class PackDAO implements PackManager {
             Cursor cursor = db.query(TABLE_NAME_PACKS, null, selection, selectionArgs, null, null, null);
 
             if (cursor!= null && cursor.moveToFirst()) { // Check if cursor is not null and move to first row
-                WritableMap pack = DataConverter.convertCursor2MapForPack(cursor);
+                WritableMap pack = DataConverter.cursor2map_pack(cursor);
 
                 // get the stickers for the current pack
-                WritableArray stickersArray = DataConverter.convertCursor2ArrayForSticker(db, identifier);
+                WritableArray stickersArray = DataConverter.cursor2array_stickers(db, identifier);
 
                 pack.putArray(Const.Pack.COL_STICKERS, stickersArray);
 

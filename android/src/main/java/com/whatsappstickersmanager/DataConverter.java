@@ -23,7 +23,6 @@ import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.Build;
 import android.util.Log;
 
 import com.facebook.react.bridge.ReadableArray;
@@ -37,10 +36,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 public class DataConverter {
     private static final String TAG = DataConverter.class.getSimpleName();
-    static ContentValues map2ContentValues(ReadableMap packData) {
+    static ContentValues map2content_pack(ReadableMap packData, Map<String, String> pathMap) {
         try{
             ContentValues pack = new ContentValues();
 
@@ -55,9 +55,12 @@ public class DataConverter {
                         break;
                     case String:
                         if(key.equals(COL_TRAY)){
-                            String fileName = Utility.getLastBitFromUrl(packData.getString(key));
-                            Log.w(TAG, "getPack: COL_TRAY " + fileName);
-                            pack.put(key, fileName);
+//                            String fileName = Utility.getLastBitFromUrl(packData.getString(key));
+//                            Log.w(TAG, "getPack: COL_TRAY " + fileName);
+                            String ogPath = packData.getString(key);
+                            String newName = UUID.randomUUID().toString()+".webp";
+                            pathMap.put(ogPath, newName);
+                            pack.put(key, newName);
                             break;
                         }
                         pack.put(key, packData.getString(key));
@@ -72,48 +75,34 @@ public class DataConverter {
         }
     }
 
-    public static List<ContentValues> getStickers(ReadableMap packData, int identifier) {
-        List<ContentValues> stickers = new ArrayList<>();
-
-        ReadableArray array = packData.getArray("stickers");
+    public static List<ContentValues> array2content_stickers(ReadableArray array, int identifier, Map<String, String> pathMap) {
+        List<ContentValues> stickersList = new ArrayList<>();
 
         for (int i = 0; i< array.size(); i++) {
             ReadableMap stickerData = array.getMap(i);
-            stickers.add(getSticker(stickerData, identifier));
+
+            ContentValues sticker = new ContentValues();
+
+            // Convert array to comma separated string
+            String emojis = array2string_emoji(stickerData.getArray(COL_EMOJIS));
+
+            String fileName = stickerData.getString(COL_IMAGE_FILE);
+            String newName = UUID.randomUUID().toString() + ".webp";
+            pathMap.put(fileName, newName);
+
+            sticker.put(COL_EMOJIS, emojis);
+            sticker.put(COL_IMAGE_FILE, newName);
+            sticker.put(COL_IDENTIFIER, identifier);
+            stickersList.add(sticker);
         }
 
-        return stickers;
+        return stickersList;
     }
 
-    // convert sticker ReadableMap into ContentValues (map)
-    private static ContentValues getSticker(ReadableMap stickerData, int identifier) {
-        ContentValues sticker = new ContentValues();
 
-        // Convert array to comma separated string
-        String emojis = getEmojis(stickerData.getArray(COL_EMOJIS));
-        // extract only last segment from url
-        String fileName = Utility.getLastBitFromUrl(stickerData.getString(COL_IMAGE_FILE));
-        Log.v(TAG, "getSticker: " + fileName);
-        sticker.put(COL_EMOJIS, emojis);
-        sticker.put(COL_IMAGE_FILE, fileName);
-        sticker.put(COL_IDENTIFIER, identifier);
-        return sticker;
-    }
-
-    private static String getEmojis(ReadableArray array) {
-        // Add the emojis to the ContentValues object
-        String emojisString = "";
-        for (int i=0; i<array.size(); i++) {
-            emojisString += array.getString(i);
-            if(i<array.size()-1){
-                emojisString += ",";
-            }
-        }
-        return emojisString;
-    }
 
     @SuppressLint("Range")
-    public static WritableMap convertCursor2MapForPack(Cursor cursor) {
+    public static WritableMap cursor2map_pack(Cursor cursor) {
         WritableMap packMap = new WritableNativeMap();
         try{
             // priority 1
@@ -141,7 +130,7 @@ public class DataConverter {
         }
     }
 
-    public static WritableArray convertCursor2ArrayForSticker(SQLiteDatabase db, int identifier) {
+    public static WritableArray cursor2array_stickers(SQLiteDatabase db, int identifier) {
         Cursor cursor = null;
         try {
             WritableArray stickerArray = new WritableNativeArray();
@@ -155,7 +144,7 @@ public class DataConverter {
                     WritableMap stickerMap = new WritableNativeMap();
 
                     String emojisString = cursor.getString(cursor.getColumnIndex(COL_EMOJIS));
-                    WritableArray emojis = convertEmojis2Array(emojisString);
+                    WritableArray emojis = string2array_emoji(emojisString);
 
                     stickerMap.putInt(COL_STICKER_ID, cursor.getInt(cursor.getColumnIndex(COL_STICKER_ID)));
                     stickerMap.putInt(COL_IDENTIFIER, identifier);
@@ -178,7 +167,19 @@ public class DataConverter {
         }
     }
 
-    private static WritableArray convertEmojis2Array(String emojisString) {
+    private static String array2string_emoji(ReadableArray array) {
+        // Add the emojis to the ContentValues object
+        String emojisString = "";
+        for (int i=0; i<array.size(); i++) {
+            emojisString += array.getString(i);
+            if(i<array.size()-1){
+                emojisString += ",";
+            }
+        }
+        return emojisString;
+    }
+
+    private static WritableArray string2array_emoji(String emojisString) {
         String[] emojisArray = emojisString.split(",");
         WritableArray emojisWritableArray = new WritableNativeArray();
         for (String emoji : emojisArray) {
@@ -187,7 +188,7 @@ public class DataConverter {
         return emojisWritableArray;
     }
 
-    public static ContentValues map2ContentValuesForFields(ReadableMap fields) {
+    public static ContentValues map2Content_option(ReadableMap fields) {
         ContentValues values = new ContentValues();
 
         for (Map.Entry<String, Object> entry : fields.toHashMap().entrySet()) {
