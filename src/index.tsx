@@ -24,6 +24,8 @@ const WhatsappStickersManager = WhatsappStickersManagerModule
       }
     );
 
+export default WhatsappStickersManager;
+
 export function multiply(a: number, b: number): Promise<number> {
   return WhatsappStickersManager.multiply(a, b);
 }

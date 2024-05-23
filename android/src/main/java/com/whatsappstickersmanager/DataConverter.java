@@ -16,8 +16,10 @@ import static com.whatsappstickersmanager.Const.Pack.COL_VERSION;
 import static com.whatsappstickersmanager.Const.Sticker.COL_EMOJIS;
 import static com.whatsappstickersmanager.Const.Sticker.COL_IMAGE_FILE;
 import static com.whatsappstickersmanager.Const.Sticker.COL_STICKER_ID;
+import static com.whatsappstickersmanager.WhatsappStickersManagerModule.STICKER_ASSET_PATH;
 import static com.whatsappstickersmanager.database.DatabaseHelper.TABLE_NAME_STICKERS;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -110,14 +112,16 @@ public class DataConverter {
         return emojisString;
     }
 
+    @SuppressLint("Range")
     public static WritableMap convertCursor2MapForPack(Cursor cursor) {
         WritableMap packMap = new WritableNativeMap();
         try{
             // priority 1
-            packMap.putInt(COL_IDENTIFIER, cursor.getInt(cursor.getColumnIndex(COL_IDENTIFIER)));
+            int identifier = cursor.getInt(cursor.getColumnIndex(COL_IDENTIFIER));
+            packMap.putInt(COL_IDENTIFIER, identifier);
+            packMap.putString(COL_TRAY, STICKER_ASSET_PATH+"/"+identifier+"/"+cursor.getString(cursor.getColumnIndex(COL_TRAY)));
             packMap.putString(COL_NAME, cursor.getString(cursor.getColumnIndex(COL_NAME)));
             packMap.putString(COL_PUBLISHER, cursor.getString(cursor.getColumnIndex(COL_PUBLISHER)));
-            packMap.putString(COL_TRAY, cursor.getString(cursor.getColumnIndex(COL_TRAY)));
             packMap.putString(COL_VERSION, cursor.getString(cursor.getColumnIndex(COL_VERSION)));
             packMap.putBoolean(COL_ANIMATED, 1 == cursor.getInt(cursor.getColumnIndex(COL_ANIMATED)));
             packMap.putBoolean(COL_AVOID_CACHE, 1 == cursor.getInt(cursor.getColumnIndex(COL_AVOID_CACHE)));
@@ -155,7 +159,7 @@ public class DataConverter {
 
                     stickerMap.putInt(COL_STICKER_ID, cursor.getInt(cursor.getColumnIndex(COL_STICKER_ID)));
                     stickerMap.putInt(COL_IDENTIFIER, identifier);
-                    stickerMap.putString(COL_IMAGE_FILE, cursor.getString(cursor.getColumnIndex(COL_IMAGE_FILE)));
+                    stickerMap.putString(COL_IMAGE_FILE, STICKER_ASSET_PATH+"/"+identifier+"/"+cursor.getString(cursor.getColumnIndex(COL_IMAGE_FILE)));
                     stickerMap.putArray(COL_EMOJIS, emojis);
 
                     stickerArray.pushMap(stickerMap);

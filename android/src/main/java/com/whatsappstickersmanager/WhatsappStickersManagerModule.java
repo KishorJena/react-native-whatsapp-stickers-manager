@@ -65,6 +65,7 @@ public class WhatsappStickersManagerModule extends com.whatsappstickersmanager.W
       List<ContentValues> stickers = DataConverter.getStickers(packData, identifier);
       packDAO.insertStickers(stickers);
 
+      FileActions.copyFiles(packData, identifier);
       promise.resolve("createPack success :identifer"+ identifier);
     }catch (Exception e){
       Log.v(TAG, "createPack error "+ e);
