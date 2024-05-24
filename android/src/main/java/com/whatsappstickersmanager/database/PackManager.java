@@ -4,6 +4,7 @@ import android.content.ContentValues;
 
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
+import com.whatsappstickersmanager.ContentProvider.StickerPack;
 
 import java.util.List;
 

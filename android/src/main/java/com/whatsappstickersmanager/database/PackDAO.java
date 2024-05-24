@@ -17,6 +17,7 @@ import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeArray;
 import com.whatsappstickersmanager.Const;
+import com.whatsappstickersmanager.ContentProvider.StickerPack;
 import com.whatsappstickersmanager.DataConverter;
 
 import java.util.List;
@@ -69,6 +70,7 @@ public class PackDAO implements PackManager {
         }
     }
 
+    @SuppressLint("Range")
     @Override
     public WritableArray getPacksALL() {
         try (SQLiteDatabase db = helper.getReadableDatabase()) {
@@ -142,7 +144,7 @@ public class PackDAO implements PackManager {
     @Override
     public int updatePack(int identifier, ContentValues values) {
         try (SQLiteDatabase db = helper.getWritableDatabase()) {
-            if (!values.isEmpty()) {
+            if (values.size() > 0) {
                 String whereClause = COL_IDENTIFIER + "=?";
                 String[] whereArgs = new String[]{String.valueOf(identifier)};
 

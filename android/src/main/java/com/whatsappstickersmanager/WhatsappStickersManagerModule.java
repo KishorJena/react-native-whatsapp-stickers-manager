@@ -8,20 +8,25 @@ import static com.whatsappstickersmanager.Const.Sticker.COL_IMAGE_FILE;
 import static com.whatsappstickersmanager.Const.Sticker.COL_STICKER_ID;
 
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.facebook.react.bridge.ActivityEventListener;
+import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.bridge.WritableNativeMap;
 import com.whatsappstickersmanager.database.PackDAO;
 import com.whatsappstickersmanager.database.StickerDAO;
 
@@ -32,10 +37,12 @@ import java.util.Map;
 import java.util.UUID;
 
 public class WhatsappStickersManagerModule extends com.whatsappstickersmanager.WhatsappStickersManagerSpec implements ActivityEventListener {
-  String TAG = WhatsappStickersManagerModule.class.getSimpleName();
+  static String TAG = WhatsappStickersManagerModule.class.getSimpleName();
   public static final String NAME = "WhatsappStickersManager";
   public static final String ASSET_FOLDER_NAME = "stickers_asset";
   public static String STICKER_ASSET_PATH = null;
+
+  Promise activityResultPromise;
 
   WhatsappStickersManagerModule(ReactApplicationContext context) {
     super(context);
@@ -45,7 +52,11 @@ public class WhatsappStickersManagerModule extends com.whatsappstickersmanager.W
     context.addActivityEventListener(this);
   }
 
-  @Override
+  public static String getContentProviderAuthority(Context context) {
+    return context.getPackageName()+".stickercontentprovider";
+  }
+
+    @Override
   @NonNull
   public String getName() {
     return NAME;
@@ -57,6 +68,24 @@ public class WhatsappStickersManagerModule extends com.whatsappstickersmanager.W
     promise.resolve(s);
   }
 
+  @ReactMethod
+  public void installPack(int identifier, String name, Promise promise) {
+    activityResultPromise = promise;
+    try {
+      String authority=getContentProviderAuthority(context);
+      Intent intent = new Intent();
+      intent.setAction("com.whatsapp.intent.action.ENABLE_STICKER_PACK");
+      intent.putExtra(Const.Extra.EXTRA_STICKER_PACK_ID, String.valueOf(identifier)); //identifier is the pack's identifier in contents.json file
+      intent.putExtra(Const.Extra.EXTRA_STICKER_PACK_AUTHORITY, authority); //authority is the ContentProvider's authority. In the case of the sample app it is BuildConfig.CONTENT_PROVIDER_AUTHORITY.
+      intent.putExtra(Const.Extra.EXTRA_STICKER_PACK_NAME, name); //stickerPackName is the name of the sticker pack.
+
+      context.startActivityForResult(intent, Const.ADD_PACK_CODE, null);
+    }catch (ActivityNotFoundException e){
+      Log.v(TAG, "installPack : ActivityNotFoundException", e);
+    } catch (Exception e) {
+      Log.v(TAG, "installPack : Exception ", e);
+    }
+  }
   @ReactMethod
   public void createPack(ReadableMap packData, Promise promise) {
     // Create a map to store the original file names and their corresponding new random file names
@@ -79,13 +108,16 @@ public class WhatsappStickersManagerModule extends com.whatsappstickersmanager.W
         String createdFile = FileActions.SaveImage( sourcePath, fileName, identifier);
         //TODO set result if file craeted or not ; createdFile
       }
-      promise.resolve("createPack success :identifer"+ identifier);
+
+      WritableMap result = new WritableNativeMap();
+      result.putInt("identifier", identifier);
+      result.putString("name", packData.getString("name"));
+      promise.resolve(result);
     }catch (Exception e){
       Log.v(TAG, "createPack error "+ e);
       promise.reject(e);
     }
   }
-
 
   @ReactMethod
   public void getPacksAll(Promise promise) {
@@ -138,11 +170,11 @@ public class WhatsappStickersManagerModule extends com.whatsappstickersmanager.W
 
   ////// Update Pack //////
   @ReactMethod
-  public void updatePackMeta(int identifier, ReadableMap fields, com.facebook.react.bridge.Promise promise) {
+  public void updatePackMeta(int identifier, ReadableMap options, com.facebook.react.bridge.Promise promise) {
     try {
-      ContentValues pack = DataConverter.map2Content_option(fields);
+      ContentValues fields = DataConverter.map2Content_option(options);
       PackDAO packDAO = new PackDAO(context);
-      int rowUpdated = packDAO.updatePack(identifier, pack);
+      int rowUpdated = packDAO.updatePack(identifier, fields);
       promise.resolve(rowUpdated);
     }catch (Exception e){
       promise.reject(e);
@@ -246,7 +278,61 @@ public class WhatsappStickersManagerModule extends com.whatsappstickersmanager.W
 
   ////// Handle Activity Result for Adding Sticker to Whatsapppack //////
   @Override
-  public void onActivityResult(Activity activity, int i, int i1, @Nullable Intent intent) {
+  public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent intent) {
+    WritableMap map = Arguments.createMap();
+    // Left - keys
+    String KEY_CODE = "code";
+    String KEY_TYPE = "type";
+    String KEY_MESSAGE = "message";
+    String KEY_VALIDATE = "isPackValid";
+    // Right - values
+    String type = null;
+    String message = null;
+    boolean isPackValid = false;
+
+    if (intent != null) {
+      Bundle extras = intent.getExtras();
+      if (extras != null) {
+        for (String key : extras.keySet()) {
+          Object value = extras.get(key);
+          if (value != null) {
+            type = key;
+            message = value.toString();
+          }
+        }
+      }
+    }
+
+    // Match the requestCode ADD PACK : 200
+    // user_cancelled, validation_error, already_added, user_touched_outside
+    if (requestCode == Const.ADD_PACK_CODE) {
+      switch (resultCode){
+        case Activity.RESULT_OK:
+          isPackValid = true;
+          break;
+        case Activity.RESULT_CANCELED:
+          if(intent==null){
+            isPackValid = true;
+            type = "user_touched_outside";
+            message = "User might have touched outside the alert box whici is similar as [user_cancelled]";
+          }else if(message != null && message.equals("true")){
+            isPackValid = true;
+          }
+          break;
+        default:
+          // not encountered this case yet
+          type = "unknown";
+          message = "Issue is unknown";
+      }
+
+    } // elese other requestedCodes if defined
+
+    map.putInt(KEY_CODE, resultCode);
+    map.putString(KEY_TYPE, type);
+    map.putString(KEY_MESSAGE, message);
+    map.putBoolean(KEY_VALIDATE, isPackValid);
+
+    activityResultPromise.resolve(map);
 
   }
 

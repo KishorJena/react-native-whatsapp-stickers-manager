@@ -21,11 +21,11 @@ public class Const {
         public static final String COL_AVOID_CACHE = "avoid_cache";
         public static final String COL_ANIMATED = "animated_sticker_pack";
         public static final String COL_STICKERS = "stickers";
-        public static final String COL_ID = "id";
     }
 
     public static class Sticker {
         public static final String COL_STICKER_ID = "sticker_id";
+        public static final String COL_IDENTIFIER_IN_STICKER = Pack.COL_IDENTIFIER;
         public static final String COL_IMAGE_FILE = "image_file";
         public static final String COL_EMOJIS = "emojis";
     }
