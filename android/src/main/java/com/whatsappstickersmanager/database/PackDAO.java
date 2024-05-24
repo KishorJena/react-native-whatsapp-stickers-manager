@@ -6,6 +6,7 @@ import static com.whatsappstickersmanager.Const.Pack.COL_VERSION;
 import static com.whatsappstickersmanager.database.DatabaseHelper.TABLE_NAME_PACKS;
 import static com.whatsappstickersmanager.database.DatabaseHelper.TABLE_NAME_STICKERS;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -164,6 +165,7 @@ public class PackDAO implements PackManager {
         }
     }
 
+    @SuppressLint("Range")
     @Override
     public int updateVersion(int identifier) {
         try (SQLiteDatabase db = helper.getWritableDatabase()) {
@@ -174,7 +176,7 @@ public class PackDAO implements PackManager {
 
             Cursor cursor = db.query(TABLE_NAME_PACKS, columns, selection, selectionArgs, null, null, null);
             cursor.moveToFirst();
-            String currentVersion = cursor.getString(0);
+            String currentVersion = cursor.getString(cursor.getColumnIndex(COL_VERSION));
             cursor.close();
 
             // Increment the version number

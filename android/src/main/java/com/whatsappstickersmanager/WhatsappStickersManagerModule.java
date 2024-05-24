@@ -110,7 +110,7 @@ public class WhatsappStickersManagerModule extends com.whatsappstickersmanager.W
     }
   }
 
-  @Override
+
   @ReactMethod
   public void deletePack(int identifer, Promise promise) {
       try {
@@ -123,7 +123,7 @@ public class WhatsappStickersManagerModule extends com.whatsappstickersmanager.W
       }
   }
 
-  @Override
+
   @ReactMethod
   public void deletePacksAll(Promise promise) {
     try {
@@ -136,6 +136,7 @@ public class WhatsappStickersManagerModule extends com.whatsappstickersmanager.W
     }
   }
 
+  ////// Update Pack //////
   @ReactMethod
   public void updatePackMeta(int identifier, ReadableMap fields, com.facebook.react.bridge.Promise promise) {
     try {
@@ -146,11 +147,6 @@ public class WhatsappStickersManagerModule extends com.whatsappstickersmanager.W
     }catch (Exception e){
       promise.reject(e);
     }
-  }
-
-  @Override
-  public void updateTrayIcon(ReadableMap option, String sourceFilePath, Promise promise) {
-
   }
 
   @ReactMethod // ✅
@@ -188,15 +184,15 @@ public class WhatsappStickersManagerModule extends com.whatsappstickersmanager.W
     try{
       StickerDAO stickerDAO = new StickerDAO(context);
       int rowDeleted = stickerDAO.deleteSticker(identifier, stickerId);
+      new PackDAO(context).updateVersion(identifier);
       FileActions.deleteFile(new File(STICKER_ASSET_PATH+"/"+identifier+"/"+fileName));
       promise.resolve(rowDeleted);
     }catch (Exception e){
       promise.reject(e);
     }
   }
-  
 
-  @ReactMethod
+  @ReactMethod  // ✅
   public void updateSticker(int identifier,int sticker_id, String sourceFilePath, Promise promise) {
 
     try {
@@ -221,7 +217,8 @@ public class WhatsappStickersManagerModule extends com.whatsappstickersmanager.W
       promise.resolve(e);
     }
   }
-  @ReactMethod
+
+  @ReactMethod  // ✅
   public void updateTrayIcon(int identifier, String sourceFilePath, Promise promise) {
 
     try {
@@ -247,6 +244,7 @@ public class WhatsappStickersManagerModule extends com.whatsappstickersmanager.W
     }
   }
 
+  ////// Handle Activity Result for Adding Sticker to Whatsapppack //////
   @Override
   public void onActivityResult(Activity activity, int i, int i1, @Nullable Intent intent) {
 
