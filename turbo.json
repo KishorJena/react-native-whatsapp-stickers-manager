@@ -5,21 +5,11 @@
       "inputs": [
         "package.json",
         "android",
-        "!android/build",
+        "android/build",
         "src/*.ts",
         "src/*.tsx"
       ],
       "outputs": ["android/build/**"]
-    },
-    "build:ios": {
-      "inputs": [
-        "package.json",
-        "*.podspec",
-        "ios",
-        "src/*.ts",
-        "src/*.tsx"
-      ],
-      "outputs": []
     }
   }
 }
