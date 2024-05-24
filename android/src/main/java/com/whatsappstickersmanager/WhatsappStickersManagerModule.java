@@ -68,24 +68,7 @@ public class WhatsappStickersManagerModule extends com.whatsappstickersmanager.W
     promise.resolve(s);
   }
 
-  @ReactMethod
-  public void installPack(int identifier, String name, Promise promise) {
-    activityResultPromise = promise;
-    try {
-      String authority=getContentProviderAuthority(context);
-      Intent intent = new Intent();
-      intent.setAction("com.whatsapp.intent.action.ENABLE_STICKER_PACK");
-      intent.putExtra(Const.Extra.EXTRA_STICKER_PACK_ID, String.valueOf(identifier)); //identifier is the pack's identifier in contents.json file
-      intent.putExtra(Const.Extra.EXTRA_STICKER_PACK_AUTHORITY, authority); //authority is the ContentProvider's authority. In the case of the sample app it is BuildConfig.CONTENT_PROVIDER_AUTHORITY.
-      intent.putExtra(Const.Extra.EXTRA_STICKER_PACK_NAME, name); //stickerPackName is the name of the sticker pack.
 
-      context.startActivityForResult(intent, Const.ADD_PACK_CODE, null);
-    }catch (ActivityNotFoundException e){
-      Log.v(TAG, "installPack : ActivityNotFoundException", e);
-    } catch (Exception e) {
-      Log.v(TAG, "installPack : Exception ", e);
-    }
-  }
   @ReactMethod
   public void createPack(ReadableMap packData, Promise promise) {
     // Create a map to store the original file names and their corresponding new random file names
@@ -275,6 +258,36 @@ public class WhatsappStickersManagerModule extends com.whatsappstickersmanager.W
       promise.resolve(e);
     }
   }
+
+
+  @ReactMethod
+  public void addToWhatsApp(int identifier, String name, Promise promise) {
+    activityResultPromise = promise;
+    try {
+      String authority=getContentProviderAuthority(context);
+      Intent intent = new Intent();
+      intent.setAction("com.whatsapp.intent.action.ENABLE_STICKER_PACK");
+      intent.putExtra(Const.Extra.EXTRA_STICKER_PACK_ID, String.valueOf(identifier)); //identifier is the pack's identifier in contents.json file
+      intent.putExtra(Const.Extra.EXTRA_STICKER_PACK_AUTHORITY, authority); //authority is the ContentProvider's authority. In the case of the sample app it is BuildConfig.CONTENT_PROVIDER_AUTHORITY.
+      intent.putExtra(Const.Extra.EXTRA_STICKER_PACK_NAME, name); //stickerPackName is the name of the sticker pack.
+
+      context.startActivityForResult(intent, Const.ADD_PACK_CODE, null);
+    }catch (ActivityNotFoundException e){
+      Log.v(TAG, "installPack : ActivityNotFoundException", e);
+    } catch (Exception e) {
+      Log.v(TAG, "installPack : Exception ", e);
+    }
+  }
+  @Override
+  public void isWhitelisted(int identifier, Promise promise) {
+    try {
+      boolean result = Whitelist.isWhitelisted(context, String.valueOf(identifier));
+      promise.resolve(result);
+    }catch ( Exception e ){
+      promise.resolve(e);
+    }
+  }
+
 
   ////// Handle Activity Result for Adding Sticker to Whatsapppack //////
   @Override

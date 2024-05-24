@@ -8,6 +8,8 @@ package com.whatsappstickersmanager;
  * LICENSE file in the root directory of this source tree.
  */
 
+import static com.whatsappstickersmanager.WhatsappStickersManagerModule.getContentProviderAuthority;
+
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
@@ -28,8 +30,8 @@ class Whitelist {
     private static final String QUERY_PATH = "is_whitelisted";
     private static final String QUERY_RESULT_COLUMN_NAME = "result";
 
-    static boolean isWhitelisted(@NonNull Context context, String authority, @NonNull String identifier) {
-        STICKER_APP_AUTHORITY = authority;
+    static boolean isWhitelisted(@NonNull Context context, @NonNull String identifier) {
+        STICKER_APP_AUTHORITY = getContentProviderAuthority(context);
         try {
             if (!isWhatsAppConsumerAppInstalled(context.getPackageManager()) && !isWhatsAppSmbAppInstalled(context.getPackageManager())) {
                 return false;
