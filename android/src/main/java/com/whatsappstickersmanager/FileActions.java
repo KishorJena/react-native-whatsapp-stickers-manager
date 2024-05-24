@@ -23,6 +23,7 @@ public class FileActions {
         try (FileOutputStream out = new FileOutputStream(destinationFIle)) {
             Bitmap finalBitmap = BitmapFactory.decodeFile(source);
             finalBitmap.compress(Bitmap.CompressFormat.WEBP, 90, out);
+            finalBitmap.recycle();
             return destinationFIle.getAbsolutePath();
         }catch (Exception e) {
             Log.e(TAG, "Failed to save file", e);
