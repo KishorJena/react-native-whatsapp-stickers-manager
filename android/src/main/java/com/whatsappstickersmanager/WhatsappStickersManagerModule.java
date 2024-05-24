@@ -278,7 +278,7 @@ public class WhatsappStickersManagerModule extends com.whatsappstickersmanager.W
       Log.v(TAG, "installPack : Exception ", e);
     }
   }
-  @Override
+  @ReactMethod
   public void isWhitelisted(int identifier, Promise promise) {
     try {
       boolean result = Whitelist.isWhitelisted(context, String.valueOf(identifier));
