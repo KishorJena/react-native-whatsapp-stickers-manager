@@ -12,8 +12,6 @@ abstract class WhatsappStickersManagerSpec extends ReactContextBaseJavaModule {
     super(context);
   }
 
-  public abstract void multiply(double a, double b, Promise promise);;
-
   public abstract void createPack(ReadableMap packData, Promise promise);
 
   public abstract void getPacksAll(Promise promise);

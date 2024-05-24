@@ -63,13 +63,6 @@ public class WhatsappStickersManagerModule extends com.whatsappstickersmanager.W
   }
 
   @ReactMethod
-  public void multiply(double a, double b, Promise promise) {
-    String s = context.getFilesDir().getAbsolutePath();
-    promise.resolve(s);
-  }
-
-
-  @ReactMethod
   public void createPack(ReadableMap packData, Promise promise) {
     // Create a map to store the original file names and their corresponding new random file names
     Map<String, String> pathMap = new HashMap<>();
