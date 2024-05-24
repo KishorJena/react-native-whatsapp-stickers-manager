@@ -2,10 +2,13 @@
 
 Dynamic stickers manager for Whatsapp..
 
+TODO:
+[] ise transaction in DB operations
+
 ## Installation
 
 ```sh
-npm install react-native-whatsapp-stickers-manager
+npm install react-native-whatsapp-stickers-manager...
 ```
 
 ## Usage
