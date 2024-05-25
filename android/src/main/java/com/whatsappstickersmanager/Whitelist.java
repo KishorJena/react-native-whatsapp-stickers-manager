@@ -20,6 +20,9 @@ import android.net.Uri;
 
 import androidx.annotation.NonNull;
 
+import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.bridge.WritableNativeMap;
+
 class Whitelist {
     private static final String AUTHORITY_QUERY_PARAM = "authority";
     private static final String IDENTIFIER_QUERY_PARAM = "identifier";
@@ -30,18 +33,50 @@ class Whitelist {
     private static final String QUERY_PATH = "is_whitelisted";
     private static final String QUERY_RESULT_COLUMN_NAME = "result";
 
-    static boolean isWhitelisted(@NonNull Context context, @NonNull String identifier) {
+    static WritableMap isWhitelisted(@NonNull Context context, @NonNull String identifier, String[] customPackageNames) {
         STICKER_APP_AUTHORITY = getContentProviderAuthority(context);
+        WritableMap result = new WritableNativeMap();
+        WritableMap apps = new WritableNativeMap();
+        WritableMap whitelistStatus = new WritableNativeMap();
+        PackageManager packageManager = context.getPackageManager();
         try {
-            if (!isWhatsAppConsumerAppInstalled(context.getPackageManager()) && !isWhatsAppSmbAppInstalled(context.getPackageManager())) {
-                return false;
+
+            boolean smbInstalled = isWhatsAppSmbAppInstalled(packageManager);
+            boolean consumerInstalled = isWhatsAppConsumerAppInstalled(packageManager);
+            apps.putBoolean("smb", smbInstalled);
+            apps.putBoolean("consumer", consumerInstalled);
+
+
+
+            if (smbInstalled || consumerInstalled) {
+
+                if (smbInstalled) {
+                    boolean smbResult = isStickerPackWhitelistedInWhatsAppSmb(context, identifier);
+                    whitelistStatus.putBoolean("smb", smbResult);
+                }
+                if (consumerInstalled) {
+                    boolean consumerResult = isStickerPackWhitelistedInWhatsAppConsumer(context, identifier);
+                    whitelistStatus.putBoolean("consumer", consumerResult);
+                }
+
             }
-            boolean consumerResult = isStickerPackWhitelistedInWhatsAppConsumer(context, identifier);
-            boolean smbResult = isStickerPackWhitelistedInWhatsAppSmb(context, identifier);
-            return consumerResult && smbResult;
+
+            // for Unofficial apps
+            for( String customPackageName : customPackageNames){
+                boolean isInstalled = isPackageInstalled(customPackageName, packageManager);
+                apps.putBoolean(customPackageName, isInstalled);
+                if(isInstalled){
+                    boolean isWhitelisted = isWhitelistedFromProvider(context, identifier, customPackageName);
+                    whitelistStatus.putBoolean(customPackageName, isWhitelisted);
+                }
+            }
+
+            result.putMap("package_availability", apps);
+            result.putMap("whitelist_status", whitelistStatus);
         } catch (Exception e) {
-            return false;
+           e.printStackTrace();
         }
+        return  result;
     }
 
     private static boolean isWhitelistedFromProvider(@NonNull Context context, @NonNull String identifier, String whatsappPackageName) {
