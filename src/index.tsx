@@ -1,5 +1,5 @@
 import { NativeModules, Platform } from 'react-native';
-import { Emoji, Sticker, StickerPack, UpdatePackOptions  } from './types/types'
+import type { StickerPack } from './types'
 const LINKING_ERROR =
   `The package 'react-native-whatsapp-stickers-manager' doesn't seem to be linked. Make sure: \n\n` +
   Platform.select({ ios: "- You have run 'pod install'\n", default: '' }) +
@@ -23,9 +23,6 @@ const WhatsappStickersManager = WhatsappStickersManagerModule
         },
       }
     );
-
-const RNWSManager = WhatsappStickersManager;
-
 
 
 // !!!!!!!!!!!!!!!!
@@ -74,7 +71,7 @@ export function updatePackMeta(identifier: number, options:{ name: string; publi
   }
   return WhatsappStickersManager.updatePackMeta(identifier);
 }
-export function updateTrayIcon(identifier:number, newImagePath:string): Promise<any> {
+export function updateTrayIcon(identifier:number, sticker_id:number, newImagePath:string): Promise<any> {
   return WhatsappStickersManager.updateTrayIcon(identifier, sticker_id, newImagePath);
 }
 
@@ -116,7 +113,7 @@ export function addPackToWhatsApp(identifier:number, name:string): Promise<any> 
   return WhatsappStickersManager.addPackToWhatsApp(identifier, name);
 }
 export function isPackAddedToWhatsApp(identifier:number, packages:string[]): Promise<any> {
-  return WhatsappStickersManager.isPackAddedToWhatsApp(identifier, []);
+  return WhatsappStickersManager.isPackAddedToWhatsApp(identifier, packages || []);
 }
 
 
