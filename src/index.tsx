@@ -143,5 +143,3 @@ export default {
   PackManager, 
   StickerManager
 };
-
-export default WhatsappStickersManager;
