@@ -274,7 +274,7 @@ public class WhatsappStickersManagerModule extends com.whatsappstickersmanager.W
     }
   }
   @ReactMethod
-  public void isWhitelisted(int identifier, ReadableArray includeExtraPackages, Promise promise) {
+  public void isPackAddedToWhatsApp(int identifier, ReadableArray includeExtraPackages, Promise promise) {
     try {
       String[] customPackageNames = new String[includeExtraPackages.size()];
       for (int i = 0; i < includeExtraPackages.size(); i++) {

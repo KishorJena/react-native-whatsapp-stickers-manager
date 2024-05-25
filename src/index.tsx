@@ -116,7 +116,7 @@ export function addPackToWhatsApp(identifier:number, name:string): Promise<any> 
   return WhatsappStickersManager.addPackToWhatsApp(identifier, name);
 }
 export function isPackAddedToWhatsApp(identifier:number, packages:string[]): Promise<any> {
-  return WhatsappStickersManager.isWhitelisted(identifier, []);
+  return WhatsappStickersManager.isPackAddedToWhatsApp(identifier, []);
 }
 
 
