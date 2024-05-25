@@ -24,4 +24,29 @@ const WhatsappStickersManager = WhatsappStickersManagerModule
       }
     );
 
+const Manager = WhatsappStickersManager;  
+
+interface CreatePackData {
+  android_play_store_link?: string;
+  ios_app_store_link?: string;
+  publisher_email?: string;
+  publisher_website?: string;
+  privacy_policy_website?: string;
+  license_agreement_website?: string;
+  name: string;
+  publisher: string;
+  tray_image_file?: string;
+  image_data_version?: string;
+  avoid_cache?: boolean;
+  animated_sticker_pack?: boolean;
+  stickers: {
+    image_file: string;
+    emojis?: string[];
+  }[];
+}
+const createPack = (packData) => {
+  
+  const validatedData = ;
+  return Manager.createPack();
+};
 export default WhatsappStickersManager;

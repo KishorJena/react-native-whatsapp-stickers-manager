@@ -1,9 +1,16 @@
-# react-native-whatsapp-stickers-manager
+<div style="text-align: center;" align="center">
+  <div><h1> React Native Whatsapp Stickers Manager </h1></div>
+  <img src="https://github.com/KishorJena/react-native-whatsapp-stickers-manager/assets/19212755/93e8dc9b-13ef-4c83-920e-16dc7fb7acb5" width="150" height="150">
+<br/><br/>
+  <div align="center">
+    <img src="https://img.shields.io/npm/v/react-native-whatsapp-stickers-manager">  
+    <img src="https://img.shields.io/npm/l/react-native-whatsapp-stickers-manager">  
+  </div>
+</div>
 
-Dynamic stickers manager for Whatsapp..
-
-TODO:
-[] ise transaction in DB operations
+<p align="center">
+  Create and manage whatsapp stickers dynamaically 
+</p>
 
 ## Installation
 
