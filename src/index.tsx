@@ -65,7 +65,7 @@ export function getPacksAll(): Promise<any> {
 }
 
 // Update ✅
-export function updatePackMeta(identifier: number, options: UpdatePackOptions): Promise<any> {
+export function updatePackMeta(identifier: number, options:{ name: string; publisher: string;}): Promise<any> {
   if (!options.name || options.name.length > 128) {
     throw new Error("Name is required and must be 128 characters or less");
   }
