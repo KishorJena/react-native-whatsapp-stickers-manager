@@ -18,15 +18,103 @@
 npm install react-native-whatsapp-stickers-manager...
 ```
 
-## Usage
+# import
+```js
+import RNWSManager from 'react-native-whatsapp-stickers-manager';
+
+```
+
+# usage
+
+<!--
+// !!!!!!!!!!!!!!!!
+//      P A C K  📦
+// !!!!!!!!!!!!!!!!
+  -->
+  
+<!-- CREATE 📦 -->
+## Create a new sticker pack
+here is an example of how to create a new sticker pack.<br/>
+For a complete reference of the sticker pack structure and requirements, see []:
+
 
 ```js
-import { multiply } from 'react-native-whatsapp-stickers-manager';
+const sticker = {
+    image_file: '/storage/emulated/0/Download/stickers/flying_bird.webp',
+    emojis: ['✌️', '🕊️']
+}
 
-// ...
+const stickerPack = {
+  // Required fields (see below for detailed structure)
+  tray_image_file: '/storage/emulated/0/Picture/rolling_panda.webp',
+  name: 'Sticker Pack Name',
+  publisher: 'Publisher Name',
+  stickers: [ sticker, sticker2, sticker3 ]
+}
 
-const result = await multiply(3, 7);
+await RNWSManager.Pack.createPack(stickerpack: StickerPack)
+
 ```
+
+## Retrieve one specific or all sticker packs 
+```js
+// RETRIEVE 📦
+await RNWSManager.Pack.getPack(identifier: number)
+await RNWSManager.Pack.getPacksAll()
+```
+
+## Update sticker pack
+```js
+// UPDATE 📦
+await RNWSManager.Pack.updatePackMeta({identifier:number; name:string, publisher:string})
+```
+OR
+```js
+// UPDATE 📦
+await RNWSManager.Pack.updatePackMeta({identifier:number, name:string})
+```
+OR
+```js
+// UPDATE 📦
+await RNWSManager.Pack.updatePackMeta({identifier:number, publisher:string})
+```
+
+## Replace tray image icon of a sticker pack
+```js
+// UPDATE 📦
+await RNWSManager.Pack.updateTrayIcon({identifier:number, newTrayImagePath:string}): 
+```
+## Delete one specific or all sticker packs  
+```js
+// DELETE 📦
+await RNWSManager.Pack.deletePack(identifier: number)
+await RNWSManager.Pack.deletePacksAll()
+```
+
+
+
+<!--
+// !!!!!!!!!!!!!!!!
+//  S T I C K E R 🖼️
+// !!!!!!!!!!!!!!!!
+  -->
+
+## Add/Remove/Replace individual stickers of a sticker pack
+```js
+// CREATE 🖼️
+await RNWSManager.Sticker.addStickerToPack({identifier: number, newStickerPath:string})
+
+// UPDATE 🖼️
+await RNWSManager.Sticker.replaceSticker({identifier:number, sticker_id:number newStickerPath:string})
+
+// DELETE 🖼️
+await RNWSManager.Sticker.removeStickerFromPack({identifier:number, sticker_id:number})
+
+
+```
+
+
+
 
 ## Contributing
 
