@@ -189,7 +189,8 @@ See the [contributing guide](CONTRIBUTING.md) to learn how to contribute to the 
 
 ## License
 
-MIT
+MIT License [LICENSE](https://github.com/your-username/your-repo-name/blob/main/LICENSE)
+
 
 ---
 
