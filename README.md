@@ -1,14 +1,14 @@
 <div style="text-align: center;" align="center">
   <img src="https://imgur.com/cNwrHoD.png" width="150" height="150">
   <div><h1> React Native Whatsapp Stickers Manager </h1></div>
-
+  <p align="center">
+    "The ultimate WhatsApp sticker manager to create, manage and share the stickers for React Native apps."
+  </p>
   <div align="center">
     <img src="https://img.shields.io/npm/v/react-native-whatsapp-stickers-manager">  
     <img src="https://img.shields.io/npm/l/react-native-whatsapp-stickers-manager">  
   </div>
-  <p align="center">
-    "The ultimate WhatsApp sticker manager to create, manage and share the stickers for React Native apps."
-    </p>
+
 </div>
 
 
