@@ -22,7 +22,7 @@ public class FileActions {
 
         try (FileOutputStream out = new FileOutputStream(destinationFIle)) {
             Bitmap finalBitmap = BitmapFactory.decodeFile(source);
-            finalBitmap.compress(Bitmap.CompressFormat.WEBP, 90, out);
+            finalBitmap.compress(Bitmap.CompressFormat.WEBP, 70, out);
             finalBitmap.recycle();
             return destinationFIle.getAbsolutePath();
         }catch (Exception e) {

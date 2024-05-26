@@ -130,6 +130,7 @@ public class WhatsappStickersManagerModule extends com.whatsappstickersmanager.W
       ContentValues fields = DataConverter.map2Content_option(options);
       PackDAO packDAO = new PackDAO(context);
       int rowUpdated = packDAO.updatePack(identifier, fields);
+      packDAO.updateVersion(identifier);
       promise.resolve(rowUpdated);
     }catch (Exception e){
       promise.reject(e);
@@ -137,7 +138,7 @@ public class WhatsappStickersManagerModule extends com.whatsappstickersmanager.W
   }
 
   @ReactMethod
-  public void insertStickerToPack(int identifier, String stickerPath, Promise promise) {
+  public void insertStickerToPack(int identifier, String newStickerPath, Promise promise) {
 
     try {
       String destinationFileName = UUID.randomUUID().toString() + ".webp";
@@ -153,7 +154,7 @@ public class WhatsappStickersManagerModule extends com.whatsappstickersmanager.W
       new PackDAO(context).updateVersion(identifier);
 
       // Save file
-      FileActions.SaveImage(stickerPath, destinationFileName, identifier);
+      FileActions.SaveImage(newStickerPath, destinationFileName, identifier);
 
       promise.resolve(rowUpdated);
     }catch ( Exception e ){
@@ -163,15 +164,14 @@ public class WhatsappStickersManagerModule extends com.whatsappstickersmanager.W
   }
 
   @ReactMethod
-  public void removeStickerFromPack(ReadableMap option, Promise promise) {
-    int identifier = option.getInt(COL_IDENTIFIER);
-    int stickerId = option.getInt(COL_STICKER_ID);
-    String fileName = option.getString(COL_IMAGE_FILE);
+  public void removeStickerFromPack(int identifier, int sticker_id, Promise promise) {
 
     try{
       StickerDAO stickerDAO = new StickerDAO(context);
-      int rowDeleted = stickerDAO.deleteSticker(identifier, stickerId);
+      int rowDeleted = stickerDAO.deleteSticker(identifier, sticker_id);
       new PackDAO(context).updateVersion(identifier);
+
+      String fileName = stickerDAO.getStickerName( identifier, sticker_id);
       FileActions.deleteFile(new File(STICKER_ASSET_PATH+"/"+identifier+"/"+fileName));
       promise.resolve(rowDeleted);
     }catch (Exception e){

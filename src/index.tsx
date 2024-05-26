@@ -26,11 +26,11 @@ const WhatsappStickersManager = WhatsappStickersManagerModule
 
 
 // !!!!!!!!!!!!!!!!
-//      P A C K 
+//      P A C K  ✅
 // !!!!!!!!!!!!!!!!
 
-//  Create
-export function createPack(stickerPack: StickerPack): Promise<void> {
+//  Create ✅
+function createPack(stickerPack: StickerPack): Promise<void> {
   if (!stickerPack.name || stickerPack.name.length > 128) {
     throw new Error("Name is required and must be 128 characters or less");
   }
@@ -53,33 +53,39 @@ export function createPack(stickerPack: StickerPack): Promise<void> {
   return WhatsappStickersManager.createPack(stickerPack);
 }
 
-//  Retrieve 
-export function getPack(identifier: number): Promise<any> {
+//  Retrieve ✅
+function getPack(identifier: number): Promise<any> {
   return WhatsappStickersManager.getPack(identifier);
 }
-export function getPacksAll(): Promise<any> {
+
+//  Retrieve All ✅
+function getPacksAll(): Promise<any> {
   return WhatsappStickersManager.getPacksAll();
 }
 
-// Update ✅
-export function updatePackMeta(identifier: number, options:{ name: string; publisher: string;}): Promise<any> {
+// Update Meta ✅ 
+function updatePackMeta(options:{identifier:number; name:string; publisher:string;}): Promise<any> {
   if (!options.name || options.name.length > 128) {
     throw new Error("Name is required and must be 128 characters or less");
   }
   if (!options.publisher || options.publisher.length > 128) {
     throw new Error("Publisher is required and must be 128 characters or less");
   }
-  return WhatsappStickersManager.updatePackMeta(identifier);
+  return WhatsappStickersManager.updatePackMeta(options.identifier, {name:options.name, publisher:options.publisher});
 }
-export function updateTrayIcon(identifier:number, sticker_id:number, newImagePath:string): Promise<any> {
-  return WhatsappStickersManager.updateTrayIcon(identifier, sticker_id, newImagePath);
+
+// Update Tray Icon ✅
+function updateTrayIcon(option:{identifier:number; newTrayImagePath:string;}): Promise<any> {
+  return WhatsappStickersManager.updateTrayIcon(option.identifier, option.newTrayImagePath);
 }
 
 // Delete ✅
-export function deletePack(identifier: number): Promise<any> {
+function deletePack(identifier: number): Promise<any> {
   return WhatsappStickersManager.deletePack(identifier);
 }
-export function deletePacksAll(): Promise<any> {
+
+// Delete All ✅
+function deletePacksAll(): Promise<any> {
   return WhatsappStickersManager.deletePacksAll();
 }
 
@@ -89,35 +95,44 @@ export function deletePacksAll(): Promise<any> {
 //  S T I C K E R
 // !!!!!!!!!!!!!!!!
 
-// create
-export function addStickerToPack(identifier: number, stickerPath:string): Promise<any> {
-  return WhatsappStickersManager.insertStickerToPack(stickerPath, identifier);
+// create ✅
+function addStickerToPack(option:{identifier: number, newStickerPath:string}): Promise<any> {
+  return WhatsappStickersManager.insertStickerToPack(option.identifier, option.newStickerPath);
 }
 
-// delete
-export function removeStickerFromPack(identifier:number, sticker_id:number, newImagePath:string): Promise<any> {
-  return WhatsappStickersManager.removeStickerFromPack({identifier, sticker_id, newImagePath});
+// delete ✅
+function removeStickerFromPack(option:{identifier:number; sticker_id:number;}): Promise<any> {
+  return WhatsappStickersManager.removeStickerFromPack(option.identifier, option.sticker_id);
 }
 
-// update
-export function replaceSticker(identifier:number, sticker_id:number, newImagePath:string): Promise<any> {
-  return WhatsappStickersManager.updateSticker(identifier, sticker_id, newImagePath);
+// update ✅
+function replaceSticker(option : {identifier:number; sticker_id:number; newStickerPath:string;}): Promise<any> {
+  return WhatsappStickersManager.updateSticker(option.identifier, option.sticker_id, option.newStickerPath);
 }
 
 
 // !!!!!!!!!!!!!!!!
 //  NON CRUD; MISC
 // !!!!!!!!!!!!!!!!
+// Add to WhatsApp ✅
+function addPackToWhatsApp(options: { identifier: number; name: string }): Promise<any> {
 
-export function addPackToWhatsApp(identifier:number, name:string): Promise<any> {
+  const { identifier, name } = options;
+  if (typeof identifier !== 'number' || typeof name !== 'string') {
+    throw new Error('Invalid options: identifier must be a number and name must be a string');
+  }
+
   return WhatsappStickersManager.addPackToWhatsApp(identifier, name);
 }
-export function isPackAddedToWhatsApp(identifier:number, packages:string[]): Promise<any> {
-  return WhatsappStickersManager.isPackAddedToWhatsApp(identifier, packages || []);
+
+// Is Added to WhatsApp ✅
+function isPackAddedToWhatsApp(option: { identifier: number; includeExtraPackages?: string[]}): Promise<any> {
+  
+  return WhatsappStickersManager.isPackAddedToWhatsApp(option.identifier, includeExtraPackages | []);
 }
 
 
-export const PackManager  = {
+export const Pack  = {
   createPack, 
   deletePack, 
   deletePacksAll,
@@ -129,7 +144,7 @@ export const PackManager  = {
   addPackToWhatsApp
 };
 
-export const StickerManager  = {
+export const Sticker  = {
   addStickerToPack,
   removeStickerFromPack,
   replaceSticker

@@ -27,7 +27,7 @@ abstract class WhatsappStickersManagerSpec extends ReactContextBaseJavaModule {
 
   public abstract void insertStickerToPack(int identifier,String stickerPath, Promise promise);
 
-  public abstract void removeStickerFromPack(ReadableMap option, Promise promise);
+  public abstract void removeStickerFromPack(int identifier, int sticker_id, Promise promise);
 
   public abstract void updateSticker(int identifier,int sticker_id, String sourceFilePath, Promise promise);
 
