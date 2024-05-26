@@ -12,6 +12,44 @@
   Create and manage whatsapp stickers dynamaically 
 </p>
 
+## Description
+
+React Native Whatsapp Stickers Manager is a library that allows you to create and manage WhatsApp sticker packs dynamically within your React Native application. It provides a set of APIs to perform various operations such as creating new sticker packs, adding stickers to existing packs, updating pack metadata, and more.
+
+## Features
+
+- Create new sticker packs** with custom tray icons, names, and publishers.
+- Add, remove, or replace individual stickers** in an existing sticker pack.
+- Update pack metadata** such as name and publisher.
+- Replace tray image icons** for sticker packs.
+- Add sticker packs to WhatsApp** for easy access and sharing.
+- Check if a sticker pack is already added to WhatsApp.**
+
+## Supported Platforms
+
+- [x] Android (Tested in API level 34)
+- [ ] iOS
+
+## Requirements
+
+- React Native** version 0.60 or higher
+- WhatsApp** installed on the device
+
+### Table of Contents
+
+  - [1.A: Pack Specific Operations](#1a-pack-specific-operations)
+    - [Create a new sticker pack](#create-a-new-sticker-pack)
+    - [Retrieve sticker packs](#retrieve-one-specific-or-all-sticker-packs)
+    - [Update sticker pack](#update-sticker-pack)
+    - [Replace tray icon](#replace-tray-image-icon-of-a-sticker-pack)
+    - [Delete sticker packs](#delete-one-specific-or-all-sticker-packs)
+  - [1.B: WhatsApp Interaction](#1b-whatsapp-interaction)
+    - [Add sticker pack to WhatsApp](#add-a-sticker-pack-to-whatsapp)
+    - [Check if a sticker pack is added to WhatsApp](#check-if-a-sticker-pack-is-added-to-whatsapp)
+  - [2.A: Stickers Specific Operations](#2a-stickers-specific-operations)
+    - [Add/Remove/Replace individual stickers of a sticker pack](#addremovereplace-individual-stickers-of-a-sticker-pack)
+
+
 ## Installation
 
 ```sh
@@ -25,15 +63,9 @@ import RNWSManager from 'react-native-whatsapp-stickers-manager';
 ```
 
 # usage
-
-<!--
-// !!!!!!!!!!!!!!!!
-//      P A C K  📦
-// !!!!!!!!!!!!!!!!
-  -->
-  
+## 1.A: 📦 Pack Specifica Operation 
 <!-- CREATE 📦 -->
-## Create a new sticker pack
+### Create a new sticker pack
 here is an example of how to create a new sticker pack.<br/>
 For a complete reference of the sticker pack structure and requirements, see []:
 
@@ -56,14 +88,14 @@ await RNWSManager.Pack.createPack(stickerpack: StickerPack)
 
 ```
 
-## Retrieve one specific or all sticker packs 
+### Retrieve one specific or all sticker packs 
 ```js
 // RETRIEVE 📦
 await RNWSManager.Pack.getPack(identifier: number)
 await RNWSManager.Pack.getPacksAll()
 ```
 
-## Update sticker pack
+### Update sticker pack
 ```js
 // UPDATE 📦
 await RNWSManager.Pack.updatePackMeta({identifier:number; name:string, publisher:string})
@@ -79,18 +111,29 @@ OR
 await RNWSManager.Pack.updatePackMeta({identifier:number, publisher:string})
 ```
 
-## Replace tray image icon of a sticker pack
+### Replace tray image icon of a sticker pack
 ```js
 // UPDATE 📦
 await RNWSManager.Pack.updateTrayIcon({identifier:number, newTrayImagePath:string}): 
 ```
-## Delete one specific or all sticker packs  
+### Delete one specific or all sticker packs  
 ```js
 // DELETE 📦
 await RNWSManager.Pack.deletePack(identifier: number)
 await RNWSManager.Pack.deletePacksAll()
 ```
+## 1.B: 💬 WhatsApp Interaction
 
+### Add a sticker pack to WhatsApp
+```js
+await RNWSManager.Pack.addPackToWhatsApp({identifier: number, name:string})
+```
+
+### Check if a sticker pack is added to WhatsApp
+
+```js
+await RNWSManager.Pack.isPackAddedToWhatsApp({identifier:number, includeExtraPackages?:string[]});
+```
 
 
 <!--
@@ -98,8 +141,9 @@ await RNWSManager.Pack.deletePacksAll()
 //  S T I C K E R 🖼️
 // !!!!!!!!!!!!!!!!
   -->
+## 2.A: 🖼️ Stickers Specific Operations
+### Add/Remove/Replace individual stickers of a sticker pack
 
-## Add/Remove/Replace individual stickers of a sticker pack
 ```js
 // CREATE 🖼️
 await RNWSManager.Sticker.addStickerToPack({identifier: number, newStickerPath:string})
@@ -110,8 +154,9 @@ await RNWSManager.Sticker.replaceSticker({identifier:number, sticker_id:number n
 // DELETE 🖼️
 await RNWSManager.Sticker.removeStickerFromPack({identifier:number, sticker_id:number})
 
-
 ```
+
+
 
 
 
