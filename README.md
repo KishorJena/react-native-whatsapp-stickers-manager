@@ -5,8 +5,12 @@
     "The ultimate WhatsApp sticker manager to create, manage and share the stickers for React Native apps."
   </p>
   <div align="center">
-    <img src="https://img.shields.io/npm/v/react-native-whatsapp-stickers-manager">  
-    <img src="https://img.shields.io/npm/l/react-native-whatsapp-stickers-manager">  
+    <a href="https://www.npmjs.com/package/react-native-whatsapp-stickers-manager">
+        <img src="https://img.shields.io/npm/v/react-native-whatsapp-stickers-manager">  
+    </a>
+    <a href="/LICENSE">
+        <img src="https://img.shields.io/npm/l/react-native-whatsapp-stickers-manager">  
+    </a>
   </div>
 
 </div>
