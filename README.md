@@ -18,36 +18,33 @@ React Native Whatsapp Stickers Manager is a library that allows you to create an
 
 ## Features
 
-- Create new sticker packs** with custom tray icons, names, and publishers.
-- Add, remove, or replace individual stickers** in an existing sticker pack.
-- Update pack metadata** such as name and publisher.
-- Replace tray image icons** for sticker packs.
-- Add sticker packs to WhatsApp** for easy access and sharing.
-- Check if a sticker pack is already added to WhatsApp.**
+#### Basic Operations : 
+- Create a new sticker pack
+- Add sticker pack to WhatsApp
+- Check if a sticker pack is added to WhatsApp
+<br>
+- Retrieve individual pack
+- Delete individual pack 
+- Retrieve all packs
+- Delete all packs
+
+#### Advance Operations : work with existing packs on WhatsApp
+- Update sticker pack
+- Update name of a sticker pack
+- Change name of a sticker pack 
+- Change publisher
+- Replace tray image icon
+🎭 
+- Add individual stickers
+- Remove individual stickers
+- Replace individual stickers of a sticker pack
+
 
 ## Supported Platforms
 
 - [x] Android (Tested in API level 34)
 - [ ] iOS
 
-## Requirements
-
-- React Native** version 0.60 or higher
-- WhatsApp** installed on the device
-
-### Table of Contents
-
-  - [1.A: Pack Specific Operations](#1a-pack-specific-operations)
-    - [Create a new sticker pack](#create-a-new-sticker-pack)
-    - [Retrieve sticker packs](#retrieve-one-specific-or-all-sticker-packs)
-    - [Update sticker pack](#update-sticker-pack)
-    - [Replace tray icon](#replace-tray-image-icon-of-a-sticker-pack)
-    - [Delete sticker packs](#delete-one-specific-or-all-sticker-packs)
-  - [1.B: WhatsApp Interaction](#1b-whatsapp-interaction)
-    - [Add sticker pack to WhatsApp](#add-a-sticker-pack-to-whatsapp)
-    - [Check if a sticker pack is added to WhatsApp](#check-if-a-sticker-pack-is-added-to-whatsapp)
-  - [2.A: Stickers Specific Operations](#2a-stickers-specific-operations)
-    - [Add/Remove/Replace individual stickers of a sticker pack](#addremovereplace-individual-stickers-of-a-sticker-pack)
 
 
 ## Installation
@@ -56,13 +53,13 @@ React Native Whatsapp Stickers Manager is a library that allows you to create an
 npm install react-native-whatsapp-stickers-manager...
 ```
 
-# import
+# Import
 ```js
 import RNWSManager from 'react-native-whatsapp-stickers-manager';
 
 ```
 
-# usage
+# Usage
 ## 1.A: 📦 Pack Specifica Operation 
 <!-- CREATE 📦 -->
 ### Create a new sticker pack
@@ -122,7 +119,7 @@ await RNWSManager.Pack.updateTrayIcon({identifier:number, newTrayImagePath:strin
 await RNWSManager.Pack.deletePack(identifier: number)
 await RNWSManager.Pack.deletePacksAll()
 ```
-## 1.B: 💬 WhatsApp Interaction
+## 1.B: 🟢 WhatsApp Interaction
 
 ### Add a sticker pack to WhatsApp
 ```js
@@ -138,20 +135,20 @@ await RNWSManager.Pack.isPackAddedToWhatsApp({identifier:number, includeExtraPac
 
 <!--
 // !!!!!!!!!!!!!!!!
-//  S T I C K E R 🖼️
+//  S T I C K E R 🎭
 // !!!!!!!!!!!!!!!!
   -->
-## 2.A: 🖼️ Stickers Specific Operations
+## 2.A: 🎭 Stickers Specific Operations
 ### Add/Remove/Replace individual stickers of a sticker pack
 
 ```js
-// CREATE 🖼️
+// CREATE 🎭
 await RNWSManager.Sticker.addStickerToPack({identifier: number, newStickerPath:string})
 
-// UPDATE 🖼️
+// UPDATE 🎭
 await RNWSManager.Sticker.replaceSticker({identifier:number, sticker_id:number newStickerPath:string})
 
-// DELETE 🖼️
+// DELETE 🎭
 await RNWSManager.Sticker.removeStickerFromPack({identifier:number, sticker_id:number})
 
 ```
