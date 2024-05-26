@@ -152,6 +152,6 @@ export const Sticker  = {
 
 
 export default {
-  PackManager, 
-  StickerManager
+  Pack, 
+  Sticker
 };
