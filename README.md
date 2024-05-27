@@ -41,7 +41,7 @@ React Native Whatsapp Stickers Manager is a library that allows you to create an
 - 🎭 Add a new sticker to the pack
 - 🎭 Remove a sticker from the pack
 - 🎭 Replace sticker images
-- 📨 Event-based response status from WhatsApp on adding pack to WA. see [here](#add-a-sticker-pack-to-whatsapp)
+- 📨 Event listener for user interaction with WhatsApp sticker pack addition
 
 ## Supported Platforms
 
@@ -288,8 +288,10 @@ This result is useful when you don't know what went wrong at runtime.
 
 
 ## Contributing
+Feel free to create an issue for bug, feature suggestion, improvemments, etc.
+[discussion](#discussion) : Use discussion tab for questions and help.
 
-See the [contributing guide](CONTRIBUTING.md) to learn how to contribute to the repository and the development workflow.
+[CONTRIBUTING.md](CONTRIBUTING.md) 
 
 ## License
 
@@ -298,4 +300,5 @@ MIT License [LICENSE](https://github.com/your-username/your-repo-name/blob/main/
 
 ---
 
-Made with [create-react-native-library](https://github.com/callstack/react-native-builder-bob)
+Credit:
+Project structure created with [CRNL](https://github.com/callstack/react-native-builder-bob)
