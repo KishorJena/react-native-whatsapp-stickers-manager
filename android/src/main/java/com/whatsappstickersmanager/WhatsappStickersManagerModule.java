@@ -44,13 +44,13 @@ public class WhatsappStickersManagerModule extends com.whatsappstickersmanager.W
   public static String STICKER_ASSET_PATH = null;
 
   Promise activityResultPromise;
+  ReactApplicationContext context;
+  WhatsappStickersManagerModule(ReactApplicationContext pcontext) {
+    super(pcontext);
 
-  WhatsappStickersManagerModule(ReactApplicationContext context) {
-    super(context);
-
-    this.context = context;
-    STICKER_ASSET_PATH = context.getFilesDir().getAbsolutePath() + "/"+ ASSET_FOLDER_NAME;
-    context.addActivityEventListener(this);
+    this.context = pcontext;
+    STICKER_ASSET_PATH = pcontext.getFilesDir().getAbsolutePath() + "/"+ ASSET_FOLDER_NAME;
+    pcontext.addActivityEventListener(this);
   }
 
   public static String getContentProviderAuthority(Context context) {
