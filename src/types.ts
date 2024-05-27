@@ -9,8 +9,8 @@ export interface StickerPack {
   publisher: string; // required, max 128 characters
   tray_image_file: string; // required
   image_data_version: string; // required
-  avoid_cache: boolean; // required 
-  animated_sticker_pack: boolean; // required 
+  avoid_cache: boolean; // required
+  animated_sticker_pack: boolean; // required
   stickers: Sticker[]; // required
 }
 export interface Sticker {
