@@ -230,6 +230,16 @@ let stickerPack = {
       
 };
 ```
+- name: The name of the sticker pack.
+- publisher: The name of the publisher for the sticker pack.
+- tray_image_file: The file path to the tray/preview image for the sticker pack.
+- image_data_version: The version of the image data for the sticker pack.
+- avoid_cache: A boolean value indicating whether to avoid caching for this sticker pack. The default - value is false.
+- animated_sticker_pack: A boolean value indicating whether this is an animated sticker pack or not.
+- stickers: An array of sticker objects, where each sticker object has the following properties:
+
+  - image_file: The file path to the sticker image file (e.g., /storage/emulated/0/Download/flying_bird.webp).
+  - emojis: An array of emojis associated with the sticker (e.g., ["😁", "😋", "😍"]).
 
 ## Response Object Details
 
