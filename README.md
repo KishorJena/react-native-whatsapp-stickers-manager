@@ -55,17 +55,17 @@ React Native Whatsapp Stickers Manager is a library that allows you to create an
 npm install react-native-whatsapp-stickers-manager...
 ```
 
-# Import
+## Import
 ```js
 import RNWSManager from 'react-native-whatsapp-stickers-manager';
 
 ```
 
-# Usage
+## Usage
 
 ## 1.A: Pack Specific Methods 📦
 
-### Create a new sticker pack
+### 1.1 Create a new sticker pack
 Create a new sticker pack with the provided pack details and sticker images
 For a complete reference of the sticker pack structure and requirements, see [Sticker Pack and Sticker Object](#Sticker-Pack-and-Sticker-Object):
 
@@ -90,7 +90,7 @@ const stickerPack = {
 await RNWSManager.Pack.createPack(stickerPack)
 
 ```
-### Retrieve Sticker Packs 
+### 1.2 Retrieve Sticker Packs 
 
 ```ts
 // Retrieve a single sticker pack by identifier
@@ -103,7 +103,7 @@ Get a list of all sticker packs currently available in the app.
 // Retrieve all available sticker packs
 await RNWSManager.Pack.getPacksAll()
 ```
-### Update Sticker Pack Metadata 
+### 1.3 Update Sticker Pack Metadata 
 ```ts
 // Update sticker pack metadata with optional fields
 await RNWSManager.Pack.updatePackMeta({
@@ -112,7 +112,7 @@ await RNWSManager.Pack.updatePackMeta({
   publisher?: string
 });
 ```
-### Replace Tray Image Icon of a Sticker Pack
+### 1.4 Replace Tray Image Icon of a Sticker Pack
 ```ts
 // Replace the tray image icon of a sticker pack
 await RNWSManager.Pack.updateTrayIcon({
@@ -120,7 +120,7 @@ await RNWSManager.Pack.updateTrayIcon({
   newTrayImagePath: string
 })
 ```
-### Delete Sticker Packs 
+### 1.5 Delete Sticker Packs 
 ```ts
 // Delete a single sticker pack by identifier
 await RNWSManager.Pack.deletePack(identifier: number)
@@ -131,7 +131,7 @@ await RNWSManager.Pack.deletePacksAll()
 
 ## 1.B: WhatsApp Interaction 🟢
 
-### Add a Sticker Pack to WhatsApp
+### 1.6 Add a Sticker Pack to WhatsApp
 Get the response status from WhatsApp when sending a sticker pack.<br/>
 The response status contains information about the outcome, including a `type` field indicating success or error`, and a `message` field providing a brief description of the error.
 
@@ -159,7 +159,7 @@ Response result example:
 ```
 ❗For more information on the response object and its properties, see the [Response Object Details section](#Response-Object-Details)
 
-### Check if a Sticker Pack is Added to WhatsApp
+### 1.7 Check if a Sticker Pack is Added to WhatsApp
 
 ```js
 // Check if a sticker pack is added to WhatsApp with an optional filter
@@ -178,7 +178,7 @@ await RNWSManager.Pack.isPackAddedToWhatsApp({
 
 ## 2.A: Stickers Specific Methods 🎭
 
-### Add a New Sticker
+### 2.1 Add a New Sticker
 ```ts 
 // Add a new sticker to a sticker pack
 await RNWSManager.Sticker.addStickerToPack({
@@ -186,7 +186,7 @@ await RNWSManager.Sticker.addStickerToPack({
   newStickerPath: string
 })
 ```
-### Replace a Sticker
+### 2.2 Replace a Sticker
 ```ts 
 // Replace an existing sticker with a new one
 await RNWSManager.Sticker.replaceSticker({
@@ -196,7 +196,7 @@ await RNWSManager.Sticker.replaceSticker({
 })
 
 ```
-### Delete a Sticker
+### 2.3 Delete a Sticker
 ```ts 
 // Remove a sticker from a sticker pack
 await RNWSManager.Sticker.removeStickerFromPack({
@@ -205,7 +205,7 @@ await RNWSManager.Sticker.removeStickerFromPack({
 })
 ```
 
-## Sticker Pack and Sticker Object
+### Sticker Pack and Sticker Object
 ```js
 let stickerPack = {
       android_play_store_link: "https://play.google.com/store/apps/details?id=com.myapp",
@@ -241,7 +241,7 @@ let stickerPack = {
   - image_file: The file path to the sticker image file (e.g., /storage/emulated/0/Download/flying_bird.webp).
   - emojis: An array of emojis associated with the sticker (e.g., ["😁", "😋", "😍"]).
 
-## Response Object Details
+### Response Object Details
 
 The response returned when user interact with the alert box of whatsapp appeares when sending sticker pack to whatsapp.
 This result is useful when you don't know what went wrong at runtime.
