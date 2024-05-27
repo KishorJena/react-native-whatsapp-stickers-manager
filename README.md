@@ -35,13 +35,13 @@ React Native Whatsapp Stickers Manager is a library that allows you to create an
 
 #### Advance Features :
 - ✨ Update existing pack (packs that are already added to WhatsApp))
-- 📦 Change Sticker Pack name
-- 📦 Change publisher
+- 📦 Change the sticker pack name
+- 📦 Change the publisher name
 - 📦 Replace tray icon image
-- 🎭 Add a sticker to pack
-- 🎭 Remove any sticker from the pack
+- 🎭 Add a new sticker to the pack
+- 🎭 Remove a sticker from the pack
 - 🎭 Replace sticker images
-- 📨 Event-based response status from WhatsApp on adding pack to WA. see [here](https://github.com/KishorJena/react-native-whatsapp-stickers-manager/tree/dev#add-a-sticker-pack-to-whatsapp)
+- 📨 Event-based response status from WhatsApp on adding pack to WA. see [here](#add-a-sticker-pack-to-whatsapp)
 
 ## Supported Platforms
 
@@ -66,8 +66,8 @@ import RNWSManager from 'react-native-whatsapp-stickers-manager';
 ## 1.A: Pack Specific Methods 📦
 
 ### Create a new sticker pack
-here is an example of how to create a new sticker pack.<br/>
-For a complete reference of the sticker pack structure and requirements, see []:
+Create a new sticker pack with the provided pack details and sticker images
+For a complete reference of the sticker pack structure and requirements, see [Sticker Pack and Sticker Object](#Sticker-Pack-and-Sticker-Object):
 
 
 ```js
@@ -91,12 +91,15 @@ await RNWSManager.Pack.createPack(stickerPack)
 
 ```
 ### Retrieve Sticker Packs 
+
 ```ts
 // Retrieve a single sticker pack by identifier
 await RNWSManager.Pack.getPack({
   identifier: number
 })
-
+```
+Get a list of all sticker packs currently available in the app.
+```ts
 // Retrieve all available sticker packs
 await RNWSManager.Pack.getPacksAll()
 ```
@@ -129,8 +132,8 @@ await RNWSManager.Pack.deletePacksAll()
 ## 1.B: WhatsApp Interaction 🟢
 
 ### Add a Sticker Pack to WhatsApp
-Get the respose status from whatsapp for sending a sticker pack.<br/>
-The response status will be either success or error with reason.
+Get the response status from WhatsApp when sending a sticker pack.<br/>
+The response status contains information about the outcome, including a `type` field indicating success or error`, and a `message` field providing a brief description of the error.
 
 Alert Boxes which returns the response status from WhatsApp: 
 
@@ -154,21 +157,7 @@ Response result example:
     "type": "validation_error"
   }
 ```
-
-
-The response returned when user interact with the alert box of whatsapp appeares when sending sticker pack to whatsapp.
-This result is useful when you don't know know what went wrong on runtime.
-- It will resolve/reject the promise when user will interact with the alert box as the promie is attached to event listener.
-- It supports most common types of errors/sucess. 
-
-
-
-Note: 
-- in some cases ```isPackValid``` wowoul be `false` even if pack is valid but it will be always ```true``` for last two alert boxes which says `pack is already added' or 'add pack''.
-- response type:`user_touched_outside` is custom and not emmited from whatsapp. This only returned if pack is valid but the alert box is cancelled by user by tapping outside of alert box.
-```isPackValid:true, type:"user_touched_outside```
-
-#### ⚠️ If you encounter any problematic response result, please [create a new issue](/issues/new) to improve this feature.
+❗For more information on the response object and its properties, see the [Response Object Details section](#Response-Object-Details)
 
 ### Check if a Sticker Pack is Added to WhatsApp
 
@@ -215,6 +204,51 @@ await RNWSManager.Sticker.removeStickerFromPack({
   sticker_id: number
 })
 ```
+
+## Sticker Pack and Sticker Object
+```js
+let stickerPack = {
+      android_play_store_link: "https://play.google.com/store/apps/details?id=com.myapp",
+      ios_app_store_link: "https://itunes.apple.com/app/myapp/id123456",
+      publisher_email:"contact@myproject.com",
+      publisher_website:"https://myproject.com",
+      privacy_policy_website:"https://myproject.com/legal",
+      license_agreement_website:"https://myproject.com/license",
+      // identifier, // Auto filled using primary key
+      name: "My Sticker Pack", 
+      publisher: "Publisher Name",
+      tray_image_file: "/storage/emulated/0/Download/trayIcon.webp",
+      image_data_version: "1",
+      avoid_cache: false, // false is default
+      animated_sticker_pack:true,
+      stickers: stickerFiles.map(item=>{
+          return {
+              image_file: item.path, // eg.: "/storage/emulated/0/Download/flying_bird.webp
+              emojis: item.emojiArray // eg.: ["😁","😋","😍"]
+          }
+      })
+      
+};
+```
+
+## Response Object Details
+
+The response returned when user interact with the alert box of whatsapp appeares when sending sticker pack to whatsapp.
+This result is useful when you don't know what went wrong at runtime.
+- It will resolve/reject the promise when user will interact with the alert box as the promie is attached to event listener.
+- It supports most common types of errors/sucess. 
+- In some cases, `isPackValid` may be false even if the pack is valid. However, it will always be true for the last two alert boxes that say "pack is already added" or "add pack".
+- The response type `user_touched_outside` is custom and not emitted from WhatsApp. This is returned if the pack is valid, but the user cancels the alert box by tapping outside of it. in that case response would be  
+```js 
+  {
+  ... 
+  isPackValid: true, 
+  type: "user_touched_outside
+  ...
+  }
+```
+
+⚠️ Note: While the library aims to provide accurate response results, there may be edge cases or scenarios where the response is incorrect or unexpected. If you encounter any problematic response results, please [create a new issue](/issues/new) to help improve this feature.
 
 
 
