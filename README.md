@@ -62,6 +62,10 @@ import RNWSManager from 'react-native-whatsapp-stickers-manager';
 ```
 
 ## Usage
+Table if content
+- [1.A: Pack Specific Methods 📦](#1a-pack Specific Methods 📦)
+- [1.B: WhatsApp Interaction 🟢](1.B: WhatsApp Interaction 🟢)
+- [2.A: Stickers Specific Methods 🎭](2.A: Stickers Specific Methods 🎭)
 
 ## 1.A: Pack Specific Methods 📦
 
@@ -205,6 +209,7 @@ await RNWSManager.Sticker.removeStickerFromPack({
 })
 ```
 
+## Detailed Reference
 ### Sticker Pack and Sticker Object
 ```js
 let stickerPack = {
@@ -230,9 +235,8 @@ let stickerPack = {
       
 };
 ```
-- name: The name of the sticker pack.
-- publisher: The name of the publisher for the sticker pack.
-- tray_image_file: The file path to the tray/preview image for the sticker pack.
+- image files: The image files you provide should not contain "file://" prefix, it may cuase `FileNotFoundException`
+- tray_image_file: .
 - image_data_version: The version of the image data for the sticker pack.
 - avoid_cache: A boolean value indicating whether to avoid caching for this sticker pack. The default - value is false.
 - animated_sticker_pack: A boolean value indicating whether this is an animated sticker pack or not.
