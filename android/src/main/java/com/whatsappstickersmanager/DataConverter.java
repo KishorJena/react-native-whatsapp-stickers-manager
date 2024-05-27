@@ -190,10 +190,15 @@ public class DataConverter {
 
     public static ContentValues map2Content_option(ReadableMap fields) {
         ContentValues values = new ContentValues();
-
-        for (Map.Entry<String, Object> entry : fields.toHashMap().entrySet()) {
-            values.put(entry.getKey(), entry.getValue().toString());
+        if(fields.hasKey(COL_NAME)){
+            values.put(COL_NAME, fields.getString(COL_NAME));
         }
+        if (fields.hasKey(COL_PUBLISHER)){
+            values.put(COL_PUBLISHER, fields.getString(COL_PUBLISHER));
+        }
+//        for (Map.Entry<String, Object> entry : fields.toHashMap().entrySet()) {
+//            values.put(entry.getKey(), entry.getValue().toString());
+//        }
 
         return values.size() > 0? values : null;
     }

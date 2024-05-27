@@ -23,6 +23,7 @@ import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
@@ -43,13 +44,13 @@ public class WhatsappStickersManagerModule extends com.whatsappstickersmanager.W
   public static String STICKER_ASSET_PATH = null;
 
   Promise activityResultPromise;
+  ReactApplicationContext context;
+  WhatsappStickersManagerModule(ReactApplicationContext pcontext) {
+    super(pcontext);
 
-  WhatsappStickersManagerModule(ReactApplicationContext context) {
-    super(context);
-
-    this.context = context;
-    STICKER_ASSET_PATH = context.getFilesDir().getAbsolutePath() + "/"+ ASSET_FOLDER_NAME;
-    context.addActivityEventListener(this);
+    this.context = pcontext;
+    STICKER_ASSET_PATH = pcontext.getFilesDir().getAbsolutePath() + "/"+ ASSET_FOLDER_NAME;
+    pcontext.addActivityEventListener(this);
   }
 
   public static String getContentProviderAuthority(Context context) {
@@ -95,16 +96,6 @@ public class WhatsappStickersManagerModule extends com.whatsappstickersmanager.W
     }
   }
 
-  @ReactMethod
-  public void getPacksAll(Promise promise) {
-    try{
-      PackDAO packDAO = new PackDAO(context);
-      WritableArray packs = packDAO.getPacksALL();
-      promise.resolve(packs);
-    }catch (Exception e){
-      promise.reject(e);
-    }
-  }
 
   @Override
   @ReactMethod
@@ -132,18 +123,6 @@ public class WhatsappStickersManagerModule extends com.whatsappstickersmanager.W
   }
 
 
-  @ReactMethod
-  public void deletePacksAll(Promise promise) {
-    try {
-      PackDAO packDAO = new PackDAO(context);
-      int rowDeleted = packDAO.deletePackALL();
-      FileActions.emptyDirectory(new File(STICKER_ASSET_PATH));
-      promise.resolve(rowDeleted);
-    }catch (Exception e){
-      promise.reject(e);
-    }
-  }
-
   ////// Update Pack //////
   @ReactMethod
   public void updatePackMeta(int identifier, ReadableMap options, com.facebook.react.bridge.Promise promise) {
@@ -151,14 +130,15 @@ public class WhatsappStickersManagerModule extends com.whatsappstickersmanager.W
       ContentValues fields = DataConverter.map2Content_option(options);
       PackDAO packDAO = new PackDAO(context);
       int rowUpdated = packDAO.updatePack(identifier, fields);
+      packDAO.updateVersion(identifier);
       promise.resolve(rowUpdated);
     }catch (Exception e){
       promise.reject(e);
     }
   }
 
-  @ReactMethod // ✅
-  public void insertStickerToPack(String stickerPath, int identifier, Promise promise) {
+  @ReactMethod
+  public void insertStickerToPack(int identifier, String newStickerPath, Promise promise) {
 
     try {
       String destinationFileName = UUID.randomUUID().toString() + ".webp";
@@ -174,7 +154,7 @@ public class WhatsappStickersManagerModule extends com.whatsappstickersmanager.W
       new PackDAO(context).updateVersion(identifier);
 
       // Save file
-      FileActions.SaveImage(stickerPath, destinationFileName, identifier);
+      FileActions.SaveImage(newStickerPath, destinationFileName, identifier);
 
       promise.resolve(rowUpdated);
     }catch ( Exception e ){
@@ -183,16 +163,15 @@ public class WhatsappStickersManagerModule extends com.whatsappstickersmanager.W
 
   }
 
-  @ReactMethod // ✅
-  public void removeStickerFromPack(ReadableMap option, Promise promise) {
-    int identifier = option.getInt(COL_IDENTIFIER);
-    int stickerId = option.getInt(COL_STICKER_ID);
-    String fileName = option.getString(COL_IMAGE_FILE);
+  @ReactMethod
+  public void removeStickerFromPack(int identifier, int sticker_id, Promise promise) {
 
     try{
       StickerDAO stickerDAO = new StickerDAO(context);
-      int rowDeleted = stickerDAO.deleteSticker(identifier, stickerId);
+      int rowDeleted = stickerDAO.deleteSticker(identifier, sticker_id);
       new PackDAO(context).updateVersion(identifier);
+
+      String fileName = stickerDAO.getStickerName( identifier, sticker_id);
       FileActions.deleteFile(new File(STICKER_ASSET_PATH+"/"+identifier+"/"+fileName));
       promise.resolve(rowDeleted);
     }catch (Exception e){
@@ -200,7 +179,7 @@ public class WhatsappStickersManagerModule extends com.whatsappstickersmanager.W
     }
   }
 
-  @ReactMethod  // ✅
+  @ReactMethod
   public void updateSticker(int identifier,int sticker_id, String sourceFilePath, Promise promise) {
 
     try {
@@ -226,7 +205,7 @@ public class WhatsappStickersManagerModule extends com.whatsappstickersmanager.W
     }
   }
 
-  @ReactMethod  // ✅
+  @ReactMethod
   public void updateTrayIcon(int identifier, String sourceFilePath, Promise promise) {
 
     try {
@@ -252,9 +231,32 @@ public class WhatsappStickersManagerModule extends com.whatsappstickersmanager.W
     }
   }
 
-
+  // all
   @ReactMethod
-  public void addToWhatsApp(int identifier, String name, Promise promise) {
+  public void deletePacksAll(Promise promise) {
+    try {
+      PackDAO packDAO = new PackDAO(context);
+      int rowDeleted = packDAO.deletePackALL();
+      FileActions.emptyDirectory(new File(STICKER_ASSET_PATH));
+      promise.resolve(rowDeleted);
+    }catch (Exception e){
+      promise.reject(e);
+    }
+  }
+  @ReactMethod
+  public void getPacksAll(Promise promise) {
+    try{
+      PackDAO packDAO = new PackDAO(context);
+      WritableArray packs = packDAO.getPacksALL();
+      promise.resolve(packs);
+    }catch (Exception e){
+      promise.reject(e);
+    }
+  }
+
+  // MISC
+  @ReactMethod
+  public void addPackToWhatsApp(int identifier, String name, Promise promise) {
     activityResultPromise = promise;
     try {
       String authority=getContentProviderAuthority(context);
@@ -272,15 +274,19 @@ public class WhatsappStickersManagerModule extends com.whatsappstickersmanager.W
     }
   }
   @ReactMethod
-  public void isWhitelisted(int identifier, Promise promise) {
+  public void isPackAddedToWhatsApp(int identifier, ReadableArray includeExtraPackages, Promise promise) {
     try {
-      boolean result = Whitelist.isWhitelisted(context, String.valueOf(identifier));
+      String[] customPackageNames = new String[includeExtraPackages.size()];
+      for (int i = 0; i < includeExtraPackages.size(); i++) {
+        customPackageNames[i] = includeExtraPackages.getString(i);
+      }
+      // check
+      WritableMap result = Whitelist.isWhitelisted(context, String.valueOf(identifier),customPackageNames);
       promise.resolve(result);
     }catch ( Exception e ){
       promise.resolve(e);
     }
   }
-
 
   ////// Handle Activity Result for Adding Sticker to Whatsapppack //////
   @Override
