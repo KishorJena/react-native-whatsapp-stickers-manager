@@ -1,6 +1,6 @@
 {
   "name": "react-native-whatsapp-stickers-manager",
-  "version": "0.1.6-alpha.0",
+  "version": "0.2.0-beta.0",
   "description": "Dynamic stickers manager for Whatsapp",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
