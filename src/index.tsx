@@ -128,7 +128,7 @@ function addPackToWhatsApp(options: { identifier: number; name: string }): Promi
 // Is Added to WhatsApp ✅
 function isPackAddedToWhatsApp(option: { identifier: number; includeExtraPackages?: string[]}): Promise<any> {
   
-  return WhatsappStickersManager.isPackAddedToWhatsApp(option.identifier, includeExtraPackages | []);
+  return WhatsappStickersManager.isPackAddedToWhatsApp(option.identifier, option.includeExtraPackages ?? []);
 }
 
 
