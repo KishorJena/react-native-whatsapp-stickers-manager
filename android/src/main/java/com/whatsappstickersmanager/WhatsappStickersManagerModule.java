@@ -57,7 +57,7 @@ public class WhatsappStickersManagerModule extends com.whatsappstickersmanager.W
     return context.getPackageName()+".stickercontentprovider";
   }
 
-    @Override
+  @Override
   @NonNull
   public String getName() {
     return NAME;
@@ -97,7 +97,6 @@ public class WhatsappStickersManagerModule extends com.whatsappstickersmanager.W
   }
 
 
-  @Override
   @ReactMethod
   public void getPack(int identifier, Promise promise) {
     try{
@@ -168,10 +167,11 @@ public class WhatsappStickersManagerModule extends com.whatsappstickersmanager.W
 
     try{
       StickerDAO stickerDAO = new StickerDAO(context);
+      String fileName = stickerDAO.getStickerName( identifier, sticker_id);
+
       int rowDeleted = stickerDAO.deleteSticker(identifier, sticker_id);
       new PackDAO(context).updateVersion(identifier);
 
-      String fileName = stickerDAO.getStickerName( identifier, sticker_id);
       FileActions.deleteFile(new File(STICKER_ASSET_PATH+"/"+identifier+"/"+fileName));
       promise.resolve(rowDeleted);
     }catch (Exception e){
@@ -193,12 +193,13 @@ public class WhatsappStickersManagerModule extends com.whatsappstickersmanager.W
       values.put(COL_EMOJIS, "♻️,🖼️");
       values.put(COL_IDENTIFIER, identifier);
 
+      // File
+      FileActions.SaveImage(sourceFilePath, targetFileName, identifier);
+      FileActions.deleteFile(new File(STICKER_ASSET_PATH+"/"+identifier+"/"+image_file));
+
       int rowUpdated = stickerDAO.updateSticker(identifier, sticker_id, values);
       new PackDAO(context).updateVersion(identifier);
 
-      // File
-      FileActions.SaveImage(sourceFilePath, targetFileName, identifier);
-      FileActions.deleteFile(new File(image_file));
       promise.resolve(rowUpdated);
     }catch ( Exception e ){
       promise.resolve(e);
@@ -211,19 +212,21 @@ public class WhatsappStickersManagerModule extends com.whatsappstickersmanager.W
     try {
       PackDAO packDAO = new PackDAO(context);
 
+      String existingTrayName = packDAO.getTrayImageFilePath(identifier);
       String targetFileName = UUID.randomUUID().toString() + ".webp";
 
       ContentValues values = new ContentValues();
       values.put(COL_TRAY, targetFileName);
-
       int rowUpdated = packDAO.updateTrayIcon(identifier, values);
 
-      // File
+
+      // save File
       FileActions.SaveImage(sourceFilePath, targetFileName, identifier);
 
-      // delete existing tray
-      String existingTrayPath = packDAO.getTrayImageFilePath(identifier);
-      FileActions.deleteFile(new File(existingTrayPath));
+      // delete existing
+      FileActions.deleteFile(new File(STICKER_ASSET_PATH+"/"+identifier+"/"+existingTrayName));
+
+      packDAO.updateVersion(identifier);
 
       promise.resolve(rowUpdated);
     }catch ( Exception e ){
