@@ -40,7 +40,7 @@ React Native Whatsapp Stickers Manager is a library that allows you to create an
 - 🎭 Add a sticker to pack
 - 🎭 Remove any sticker from the pack
 - 🎭 Replace sticker images
-- ✅ WhatsApp response status for adding pack (success / error with reason)
+- ✅ Event based response status from WhatsApp for adding pack (success / error with reason)
 
 ## Supported Platforms
 
@@ -128,6 +128,9 @@ await RNWSManager.Pack.deletePacksAll()
 ## 1.B: WhatsApp Interaction 🟢
 
 ### Add a Sticker Pack to WhatsApp
+Get the respose status from whatsapp for adding a sticker pack.<br/>
+The response status will be either success or error with reason.
+
 ```js
 // Add a sticker pack to WhatsApp with a given identifier and name
 await RNWSManager.Pack.addPackToWhatsApp({
@@ -135,6 +138,31 @@ await RNWSManager.Pack.addPackToWhatsApp({
   name: string
 })
 ```
+```bash
+Response:result: 
+
+ "status": {
+    "code": 0, 
+    "isPackValid": false, 
+    "message": "sticker count should be between 3 to 30 inclusive, it currently has 2, sticker pack: 34", 
+    "type": "validation_error"
+  }
+```
+
+The response returned when user interact with the alert box of whatsapp appeares when sending sticker pack to whatsapp.
+This result is useful when you don't know know what went wrong on runtime.
+- It will resolve/reject the promise when user will interact with the alert box as the promie is attached to event listener.
+- It supports most common types of errors/sucess. 
+- If you encounter any problems, please [create a new issue](/issues/new).
+
+
+
+
+Alert Box:
+<img src="https://imgur.com/mv1bYzb.png" height="80"  />
+<img src="https://imgur.com/60HPBjW.png" height="80"  />
+<img src="https://imgur.com/tmYsdYP.png" height="80"  />
+
 ### Check if a Sticker Pack is Added to WhatsApp
 
 ```js
