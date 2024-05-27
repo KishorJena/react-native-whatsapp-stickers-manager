@@ -158,9 +158,7 @@ This result is useful when you don't know know what went wrong on runtime.
 
 Alert Boxes which returns the response status from WhatsApp: 
 
-<img src="https://imgur.com/mv1bYzb.png" height="80"  />
-<img src="https://imgur.com/60HPBjW.png" height="80"  />
-<img src="https://imgur.com/tmYsdYP.png" height="80"  />
+<img src="https://imgur.com/mv1bYzb.png" height="80"  /> <img src="https://imgur.com/60HPBjW.png" height="80"  /> <img src="https://imgur.com/tmYsdYP.png" height="80"  />
 
 ### Check if a Sticker Pack is Added to WhatsApp
 
