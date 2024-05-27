@@ -40,7 +40,7 @@ React Native Whatsapp Stickers Manager is a library that allows you to create an
 - 🎭 Add a sticker to pack
 - 🎭 Remove any sticker from the pack
 - 🎭 Replace sticker images
-
+- ✅ WhatsApp response status for adding pack (success / error with reason)
 
 ## Supported Platforms
 
