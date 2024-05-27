@@ -62,10 +62,32 @@ import RNWSManager from 'react-native-whatsapp-stickers-manager';
 ```
 
 ## Usage
+
 Table if content
-- [1.A: Pack Specific Methods 📦](#1a-pack Specific Methods 📦)
-- [1.B: WhatsApp Interaction 🟢](1.B: WhatsApp Interaction 🟢)
-- [2.A: Stickers Specific Methods 🎭](2.A: Stickers Specific Methods 🎭)
+<details>
+  <summary>1.A: Pack Specific Methods 📦</summary>
+
+  - [1.1: Create a new sticker pack](#11-create-a-new-sticker-pack)
+  - [1.2: Retrieve Sticker Packs](#12-retrieve-sticker-packs)
+  - [1.3: Update Sticker Pack Metadata](#13-update-sticker-pack-metadata)
+  - [1.4: Replace Tray Image Icon of a Sticker Pack](#14-replace-tray-image-icon-of-a-sticker-pack)
+  - [1.5: Delete Sticker Packs](#15-delete-sticker-packs)
+
+</details>
+<details>
+  <summary>1.B: WhatsApp Interaction 🟢</summary>
+  
+  - [1.6: Add a Sticker Pack to WhatsApp](#16-add-a-sticker-pack-to-whatsapp)
+  - [1.7: Check if a Sticker Pack is Added to WhatsApp](#17-check-if-a-sticker-pack-is-added-to-whatsapp)
+
+</details>
+<details>
+  <summary>2.A: Stickers Specific Methods 🎭</summary>
+
+  - [2.1: Add a New Sticker](#21-add-a-new-sticker)
+  - [2.2: Replace a Sticker](#22-replace-a-sticker)
+  - [2.3: Delete a Sticker](#23-delete-a-sticker)
+</details>
 
 ## 1.A: Pack Specific Methods 📦
 
@@ -162,7 +184,6 @@ Alert Boxes which returns the response result from WhatsApp:
 <img src="https://imgur.com/mv1bYzb.png" height="80"  /> <img src="https://imgur.com/60HPBjW.png" height="80"  /> <img src="https://imgur.com/tmYsdYP.png" height="80"  />
 
 ❕❗For more information on the response object and its properties, see the [Response Object Details section](#Response-Object-Details)
-
 ### 1.7 Check if a Sticker Pack is Added to WhatsApp
 
 ```js
