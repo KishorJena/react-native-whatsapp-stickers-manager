@@ -40,7 +40,7 @@ React Native Whatsapp Stickers Manager is a library that allows you to create an
 - 🎭 Add a sticker to pack
 - 🎭 Remove any sticker from the pack
 - 🎭 Replace sticker images
-- ✅ Event based response status from WhatsApp for adding pack (success / error with reason)
+- ✨ Event based response status from WhatsApp on adding pack to WA. see [here](https://github.com/KishorJena/react-native-whatsapp-stickers-manager/tree/dev#add-a-sticker-pack-to-whatsapp)
 
 ## Supported Platforms
 
@@ -131,6 +131,11 @@ await RNWSManager.Pack.deletePacksAll()
 Get the respose status from whatsapp for sending a sticker pack.<br/>
 The response status will be either success or error with reason.
 
+Alert Boxes which returns the response status from WhatsApp: 
+
+<img src="https://imgur.com/mv1bYzb.png" height="80"  /> <img src="https://imgur.com/60HPBjW.png" height="80"  /> <img src="https://imgur.com/tmYsdYP.png" height="80"  />
+
+
 ```js
 // Add a sticker pack to WhatsApp with a given identifier and name
 await RNWSManager.Pack.addPackToWhatsApp({
@@ -138,8 +143,8 @@ await RNWSManager.Pack.addPackToWhatsApp({
   name: string
 })
 ```
-```bash
-Response:result: 
+Response result example: 
+```bash 
 
  "status": {
     "code": 0, 
@@ -149,16 +154,20 @@ Response:result:
   }
 ```
 
+
 The response returned when user interact with the alert box of whatsapp appeares when sending sticker pack to whatsapp.
 This result is useful when you don't know know what went wrong on runtime.
 - It will resolve/reject the promise when user will interact with the alert box as the promie is attached to event listener.
 - It supports most common types of errors/sucess. 
-- If you encounter any problems, please [create a new issue](/issues/new).
 
 
-Alert Boxes which returns the response status from WhatsApp: 
 
-<img src="https://imgur.com/mv1bYzb.png" height="80"  /> <img src="https://imgur.com/60HPBjW.png" height="80"  /> <img src="https://imgur.com/tmYsdYP.png" height="80"  />
+Note: 
+- in some cases ```isPackValid``` wowoul be `false` even if pack is valid but it will be always ```true``` for last two alert boxes which says `pack is already added' or 'add pack''.
+- response type:`user_touched_outside` is custom and not emmited from whatsapp. This only returned if pack is valid but the alert box is cancelled by user by tapping outside of alert box.
+```isPackValid:true, type:"user_touched_outside```
+
+#### ⚠️ If you encounter any problematic response result, please [create a new issue](/issues/new) to improve this feature.
 
 ### Check if a Sticker Pack is Added to WhatsApp
 
