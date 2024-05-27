@@ -135,10 +135,6 @@ await RNWSManager.Pack.deletePacksAll()
 Get the response status from WhatsApp when sending a sticker pack.<br/>
 The response status contains information about the outcome, including a `type` field indicating success or error`, and a `message` field providing a brief description of the error.
 
-Alert Boxes which returns the response status from WhatsApp: 
-
-<img src="https://imgur.com/mv1bYzb.png" height="80"  /> <img src="https://imgur.com/60HPBjW.png" height="80"  /> <img src="https://imgur.com/tmYsdYP.png" height="80"  />
-
 
 ```js
 // Add a sticker pack to WhatsApp with a given identifier and name
@@ -157,7 +153,11 @@ Response result example:
     "type": "validation_error"
   }
 ```
-❗For more information on the response object and its properties, see the [Response Object Details section](#Response-Object-Details)
+Alert Boxes which returns the response result from WhatsApp: 
+
+<img src="https://imgur.com/mv1bYzb.png" height="80"  /> <img src="https://imgur.com/60HPBjW.png" height="80"  /> <img src="https://imgur.com/tmYsdYP.png" height="80"  />
+
+❕❗For more information on the response object and its properties, see the [Response Object Details section](#Response-Object-Details)
 
 ### 1.7 Check if a Sticker Pack is Added to WhatsApp
 
@@ -258,7 +258,7 @@ This result is useful when you don't know what went wrong at runtime.
   }
 ```
 
-⚠️ Note: While the library aims to provide accurate response results, there may be edge cases or scenarios where the response is incorrect or unexpected. If you encounter any problematic response results, please [create a new issue](/issues/new) to help improve this feature.
+⚠️ Note: While the library aims to provide accurate response results, there may be edge cases or scenarios where the response is incorrect or unexpected. If you get any problematic response results, please [create a new issue](/issues/new) to help improve this feature.
 
 
 
