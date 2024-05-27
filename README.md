@@ -128,7 +128,7 @@ await RNWSManager.Pack.deletePacksAll()
 ## 1.B: WhatsApp Interaction 🟢
 
 ### Add a Sticker Pack to WhatsApp
-Get the respose status from whatsapp for adding a sticker pack.<br/>
+Get the respose status from whatsapp for sending a sticker pack.<br/>
 The response status will be either success or error with reason.
 
 ```js
@@ -156,9 +156,8 @@ This result is useful when you don't know know what went wrong on runtime.
 - If you encounter any problems, please [create a new issue](/issues/new).
 
 
+Alert Boxes which returns the response status from WhatsApp: 
 
-
-Alert Box:
 <img src="https://imgur.com/mv1bYzb.png" height="80"  />
 <img src="https://imgur.com/60HPBjW.png" height="80"  />
 <img src="https://imgur.com/tmYsdYP.png" height="80"  />
