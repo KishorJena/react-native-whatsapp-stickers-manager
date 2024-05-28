@@ -6,6 +6,9 @@
   </p>
   <div align="center">
     <a href="https://www.npmjs.com/package/react-native-whatsapp-stickers-manager">
+        <img src="https://github.com/KishorJena/react-native-whatsapp-stickers-manager/actions/workflows/ci.yml/badge.svg?branch=main">  
+    </a>
+    <a href="https://www.npmjs.com/package/react-native-whatsapp-stickers-manager">
         <img src="https://img.shields.io/npm/v/react-native-whatsapp-stickers-manager">  
     </a>
     <a href="/LICENSE">
