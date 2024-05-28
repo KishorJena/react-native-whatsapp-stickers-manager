@@ -1,5 +1,6 @@
 package com.whatsappstickersmanager.database;
 
+import static com.whatsappstickersmanager.Const.Pack.COL_ANIMATED;
 import static com.whatsappstickersmanager.Const.Pack.COL_IDENTIFIER;
 import static com.whatsappstickersmanager.Const.Pack.COL_TRAY;
 import static com.whatsappstickersmanager.Const.Pack.COL_VERSION;
@@ -224,4 +225,26 @@ public class PackDAO implements PackManager {
         }
     }
 
+    public boolean getPackType(int identifier) {
+        boolean trayImageFilePath = false;
+
+        try (SQLiteDatabase db = helper.getReadableDatabase()){
+
+            String [] cols = new String[]{Const.Pack.COL_ANIMATED};
+            String selection = COL_IDENTIFIER + " = ?";
+            String[] selectionArgs = new String[]{String.valueOf(identifier)};
+
+            Cursor cursor = db.query(TABLE_NAME_PACKS, cols, selection, selectionArgs, null, null, null);
+
+            if (cursor.moveToFirst()) {
+                return 1 == cursor.getInt(cursor.getColumnIndex(COL_ANIMATED));
+            }
+
+            cursor.close();
+            return trayImageFilePath;
+        }catch ( Exception e ){
+            Log.e(TAG, "Error at PackDAO.getTrayImageFilePath: "+ e.toString());
+            return false;
+        }
+    }
 }

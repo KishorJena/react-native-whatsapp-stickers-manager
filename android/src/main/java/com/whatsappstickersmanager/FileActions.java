@@ -7,12 +7,15 @@ import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.channels.FileChannel;
 
 public class FileActions {
     private static final String TAG = FileActions.class.getSimpleName();
 
-    public static String SaveImage(String source, String destName, int identifier) {
+    public static String SaveImage(String source, String destName, int identifier, boolean isAnimated) {
 
         File parent = new File(STICKER_ASSET_PATH + "/" + identifier);
         parent.mkdirs();
@@ -20,6 +23,16 @@ public class FileActions {
         File destinationFIle = new File(parent, destName);
         if (destinationFIle.exists()) destinationFIle.delete();
 
+        Log.v(TAG,"source "+source);
+        if(isAnimated){
+            try{
+                copyFile(new File(source),destinationFIle);
+                return destinationFIle.getAbsolutePath();
+            }catch (Exception e){
+                Log.e(TAG, "Failed to copy file", e);
+                return null;
+            }
+        }
         try (FileOutputStream out = new FileOutputStream(destinationFIle)) {
             Bitmap finalBitmap = BitmapFactory.decodeFile(source);
             finalBitmap.compress(Bitmap.CompressFormat.WEBP, 70, out);
@@ -49,16 +62,26 @@ public class FileActions {
         directory.delete();
     }
 
+
+    public static boolean deleteFile(File file) {
+        return file.exists() && file.delete();
+    }
+
+    public static void copyFile(File sourceFile, File destFile) throws IOException {
+
+        try (FileChannel source = new FileInputStream(sourceFile).getChannel(); FileChannel destination = new FileOutputStream(destFile).getChannel()) {
+            destination.transferFrom(source, 0, source.size());
+        }catch (Exception e){
+            Log.e(TAG, "Failed to copy file", e);
+            throw e;
+        }
+    }
     public static void deleteDirectories(File... directories) {
         for (File directory : directories) {
             if (directory.exists()) {
                 deleteDirectory(directory);
             }
         }
-    }
-
-    public static boolean deleteFile(File file) {
-        return file.exists() && file.delete();
     }
 
 }

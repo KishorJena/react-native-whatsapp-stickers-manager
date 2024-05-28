@@ -8,4 +8,6 @@ public interface StickerManager {
     int deleteSticker(int identifier, int stickerId);
 
     int updateSticker(int identifier, int stickerId, ContentValues values);
+
+
 }

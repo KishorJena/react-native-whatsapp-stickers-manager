@@ -5,7 +5,6 @@ import static com.whatsappstickersmanager.Const.Pack.COL_STICKERS;
 import static com.whatsappstickersmanager.Const.Pack.COL_TRAY;
 import static com.whatsappstickersmanager.Const.Sticker.COL_EMOJIS;
 import static com.whatsappstickersmanager.Const.Sticker.COL_IMAGE_FILE;
-import static com.whatsappstickersmanager.Const.Sticker.COL_STICKER_ID;
 
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
@@ -16,7 +15,6 @@ import android.os.Bundle;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.Arguments;
@@ -78,11 +76,12 @@ public class WhatsappStickersManagerModule extends com.whatsappstickersmanager.W
       List<ContentValues> stickersContent = DataConverter.array2content_stickers(packData.getArray(COL_STICKERS), identifier, pathMap);
       packDAO.insertStickers(stickersContent);
 
+      boolean isAnimated = packDAO.getPackType(identifier);
       // save tray and stickers into asset with identifier
       for (Map.Entry<String, String> entry : pathMap.entrySet()) {
         String sourcePath = entry.getKey();
         String fileName = entry.getValue();
-        String createdFile = FileActions.SaveImage( sourcePath, fileName, identifier);
+        String createdFile = FileActions.SaveImage( sourcePath, fileName, identifier, isAnimated);
         //TODO set result if file craeted or not ; createdFile
       }
 
@@ -153,7 +152,8 @@ public class WhatsappStickersManagerModule extends com.whatsappstickersmanager.W
       new PackDAO(context).updateVersion(identifier);
 
       // Save file
-      FileActions.SaveImage(newStickerPath, destinationFileName, identifier);
+      boolean isAnimated = new PackDAO(context).getPackType(identifier);
+      FileActions.SaveImage(newStickerPath, destinationFileName, identifier, isAnimated);
 
       promise.resolve(rowUpdated);
     }catch ( Exception e ){
@@ -194,7 +194,8 @@ public class WhatsappStickersManagerModule extends com.whatsappstickersmanager.W
       values.put(COL_IDENTIFIER, identifier);
 
       // File
-      FileActions.SaveImage(sourceFilePath, targetFileName, identifier);
+      boolean isAnimated = new PackDAO(context).getPackType(identifier);
+      FileActions.SaveImage(sourceFilePath, targetFileName, identifier, isAnimated);
       FileActions.deleteFile(new File(STICKER_ASSET_PATH+"/"+identifier+"/"+image_file));
 
       int rowUpdated = stickerDAO.updateSticker(identifier, sticker_id, values);
@@ -221,7 +222,7 @@ public class WhatsappStickersManagerModule extends com.whatsappstickersmanager.W
 
 
       // save File
-      FileActions.SaveImage(sourceFilePath, targetFileName, identifier);
+      FileActions.SaveImage(sourceFilePath, targetFileName, identifier, false);
 
       // delete existing
       FileActions.deleteFile(new File(STICKER_ASSET_PATH+"/"+identifier+"/"+existingTrayName));
