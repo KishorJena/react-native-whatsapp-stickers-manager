@@ -93,7 +93,6 @@
     "collectCoverage": true,
     "coverageReporters": ["json", "html"],
     "modulePathIgnorePatterns": [
-      "<rootDir>/example/node_modules",
       "<rootDir>/lib/"
     ]
   },
