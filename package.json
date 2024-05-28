@@ -88,7 +88,10 @@
   ],
   "packageManager": "yarn@3.6.1",
   "jest": {
+    "verbose": true,
     "preset": "react-native",
+    "collectCoverage": true,
+    "coverageReporters": ["json", "html"],
     "modulePathIgnorePatterns": [
       "<rootDir>/example/node_modules",
       "<rootDir>/lib/"
@@ -156,7 +159,7 @@
         "typescript",
         {
           "project": "tsconfig.build.json",
-          "tsc": "./node_modules/typescript/bin/tsc" 
+          "tsc": "./node_modules/typescript/bin/tsc"
         }
       ]
     ]
