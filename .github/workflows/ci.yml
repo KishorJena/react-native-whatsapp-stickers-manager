@@ -34,6 +34,11 @@ jobs:
 
       - name: Run unit tests
         run: yarn test --maxWorkers=2 --coverage
+      
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v4.0.1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   build-library:
     runs-on: ubuntu-latest
@@ -107,7 +112,3 @@ jobs:
         run: |
           yarn turbo run build:android --cache-dir="${{ env.TURBO_CACHE_DIR }}"
 
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v4.0.1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
