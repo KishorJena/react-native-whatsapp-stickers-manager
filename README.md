@@ -19,7 +19,7 @@
         <img src="https://img.shields.io/npm/l/react-native-whatsapp-stickers-manager">  
     </a>
     <br/>
-    <a href="x.com/heyKSR">
+    <a href="https://x.com/heyKSR">
       <img alt="X (formerly Twitter) Follow" src="https://img.shields.io/twitter/follow/heyKSR?link=https%3A%2F%2Fx.com%2FheyKSR">
     </a>
     <a href="https://github.com/KishorJena">
