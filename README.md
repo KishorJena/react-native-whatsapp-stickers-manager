@@ -312,7 +312,8 @@ Feel free to create an issue for bug, feature suggestion, improvemments, etc.
 MIT License [LICENSE](https://github.com/your-username/your-repo-name/blob/main/LICENSE)
 
 
----
+## Acknowledgments
+Inspired by https://github.com/Jobeso/react-native-whatsapp-stickers <br/>
+Scaffolded with [create-react-native-library](https://github.com/callstack/react-native-builder-bob) 
 
-Credit:
-Project structure created with [CRNL](https://github.com/callstack/react-native-builder-bob)
+---
