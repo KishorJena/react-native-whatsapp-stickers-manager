@@ -11,6 +11,10 @@
     <a href="https://www.npmjs.com/package/react-native-whatsapp-stickers-manager">
         <img src="https://img.shields.io/npm/v/react-native-whatsapp-stickers-manager">  
     </a>
+    <a href="https://www.npmjs.com/package/react-native-whatsapp-stickers-manager">
+        <img src="https://img.shields.io/github/package-json/v/KishorJena/react-native-whatsapp-stickers-manager?label=current%20version">
+">  
+    </a>
     <a href="/LICENSE">
         <img src="https://img.shields.io/npm/l/react-native-whatsapp-stickers-manager">  
     </a>
