@@ -14,13 +14,17 @@
     <a href="https://github.com/KishorJena/react-native-whatsapp-stickers-manager">
         <img src="https://img.shields.io/github/package-json/v/KishorJena/react-native-whatsapp-stickers-manager?logo=github&label=current%20version">
     </a>
-     <img src="https://img.shields.io/bundlephobia/minzip/react-native-whatsapp-stickers-manager"> 
-     <img src="https://img.shields.io/npm/unpacked-size/react-native-whatsapp-stickers-manager">
      <img src="https://img.shields.io/github/v/tag/KishorJena/react-native-whatsapp-stickers-manager">
     <a href="/LICENSE">
         <img src="https://img.shields.io/npm/l/react-native-whatsapp-stickers-manager">  
     </a>
-    
+    <br/>
+    <a href="x.com/heyKSR">
+      <img alt="X (formerly Twitter) Follow" src="https://img.shields.io/twitter/follow/heyKSR?link=https%3A%2F%2Fx.com%2FheyKSR">
+    </a>
+    <a href="https://github.com/KishorJena">
+      <img src="https://img.shields.io/github/followers/KishorJena?label=Follow&style=social" alt="GitHub Follow Badge">
+    </a>
   </div>
 
 </div>
