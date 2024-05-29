@@ -16,6 +16,7 @@
     </a>
      <img src="https://img.shields.io/bundlephobia/minzip/react-native-whatsapp-stickers-manager"> 
      <img src="https://img.shields.io/npm/unpacked-size/react-native-whatsapp-stickers-manager">
+     <img src="https://img.shields.io/github/v/tag/KishorJena/react-native-whatsapp-stickers-manager">
     <a href="/LICENSE">
         <img src="https://img.shields.io/npm/l/react-native-whatsapp-stickers-manager">  
     </a>
