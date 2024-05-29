@@ -157,8 +157,7 @@
       [
         "typescript",
         {
-          "project": "tsconfig.build.json",
-          "tsc": "./node_modules/typescript/bin/tsc"
+          "project": "tsconfig.build.json"
         }
       ]
     ]
