@@ -303,9 +303,9 @@ public class WhatsappStickersManagerModule extends com.whatsappstickersmanager.W
       for ( int i = 0; i < stickers.size(); i++){
         ReadableMap sticker = stickers.getMap(i);
         String imageFileName = sticker.getString(COL_IMAGE_FILE);
-//        WritableMap stickerResult = StickerPackValidator.validateStickerFile(imageFileName, stickerPack.getBoolean(COL_ANIMATED));
-        result.pushString(imageFileName);
-//        result.pushMap(stickerResult);
+        WritableMap stickerResult = StickerPackValidator.validateStickerFile(imageFileName, stickerPack.getBoolean(COL_ANIMATED));
+//        result.pushString(imageFileName);
+        result.pushMap(stickerResult);
       }
       promise.resolve(result);
     }catch (Exception e){

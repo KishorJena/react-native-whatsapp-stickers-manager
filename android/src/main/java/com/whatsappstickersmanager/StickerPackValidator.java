@@ -61,6 +61,58 @@ class StickerPackValidator {
 
     static WritableMap validateStickerFile(final String filePath, final boolean animatedStickerPack) throws IllegalStateException {
         WritableMap result = new WritableNativeMap();
+        result.putString("filePath", filePath);
+
+        // overall validation
+        boolean isValidSticker = false;
+        try {
+            final byte[] stickerInBytes = toByteArray(filePath);
+
+            // 1. FILE SIZE
+            WritableMap fileSIze = new WritableNativeMap();
+            int currentSize = (int) (stickerInBytes.length / KB_IN_BYTES);
+            fileSIze.putInt("currentSize", currentSize);
+            fileSIze.putInt("maxRequiredSize", STATIC_STICKER_FILE_LIMIT_KB);
+            boolean validFileSize = stickerInBytes.length <= STATIC_STICKER_FILE_LIMIT_KB * KB_IN_BYTES;
+            fileSIze.putBoolean("valid", validFileSize);
+            result.putMap("fileSize",fileSIze);
+
+            // 2. FILE HEIGHT
+            final WebPImage webPImage = WebPImage.createFromByteArray(stickerInBytes, ImageDecodeOptions.defaults());
+            WritableMap mapHeight = new WritableNativeMap();
+            mapHeight.putInt("actualHeight", webPImage.getHeight());
+            mapHeight.putInt("requiredHeight", IMAGE_HEIGHT);
+            boolean validHeight = webPImage.getHeight() == IMAGE_HEIGHT;
+            mapHeight.putBoolean("valid",validHeight);
+            result.putMap("height",mapHeight);
+
+            // 3. FILE WIDTH
+            WritableMap mapWidth = new WritableNativeMap();
+            mapWidth.putInt("actualWidth", webPImage.getWidth());
+            mapWidth.putInt("requiredWidth", IMAGE_WIDTH);
+            boolean validWidth = webPImage.getWidth() == IMAGE_WIDTH;
+            mapWidth.putBoolean("valid",validWidth);
+            result.putMap("width",mapWidth);
+
+            WritableMap mapFrameCount = new WritableNativeMap();
+            mapFrameCount.putInt("actualFrameCount", webPImage.getFrameCount());
+            mapFrameCount.putInt("requiredFrameCount", 1);
+            boolean validFrameCount = webPImage.getFrameCount() <= 1;
+            mapFrameCount.putBoolean("valid",validFrameCount);
+            result.putMap("isAnimated",mapFrameCount);
+
+            result.putBoolean("validFile", true);
+
+            isValidSticker = validFileSize && validHeight && validWidth && validFrameCount;
+            result.putBoolean("isValidSticker",isValidSticker);
+        } catch (IOException e) {
+            result.putBoolean("validFile", false);
+        }
+        return result;
+    }
+
+    static WritableMap validateStickerFileAnim(final String filePath, final boolean animatedStickerPack) throws IllegalStateException {
+        WritableMap result = new WritableNativeMap();
         try {
             final byte[] stickerInBytes = toByteArray(filePath);
             if (!animatedStickerPack && stickerInBytes.length > STATIC_STICKER_FILE_LIMIT_KB * KB_IN_BYTES) {
@@ -146,39 +198,4 @@ class StickerPackValidator {
         }
     }
 
-    private static void checkStringValidity(@NonNull String string) {
-        String pattern = "[\\w-.,'\\s]+"; // [a-zA-Z0-9_-.' ]
-        if (!string.matches(pattern)) {
-            throw new IllegalStateException(string + " contains invalid characters, allowed characters are a to z, A to Z, _ , ' - . and space character");
-        }
-        if (string.contains("..")) {
-            throw new IllegalStateException(string + " cannot contain ..");
-        }
-    }
-
-    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    private static boolean isValidWebsiteUrl(String websiteUrl) throws IllegalStateException {
-        try {
-            new URL(websiteUrl);
-        } catch (MalformedURLException e) {
-            Log.e("StickerPackValidator", "url: " + websiteUrl + " is malformed");
-            throw new IllegalStateException("url: " + websiteUrl + " is malformed", e);
-        }
-        return URLUtil.isHttpUrl(websiteUrl) || URLUtil.isHttpsUrl(websiteUrl);
-
-    }
-
-    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    private static boolean isURLInCorrectDomain(String urlString, String domain) throws IllegalStateException {
-        try {
-            URL url = new URL(urlString);
-            if (domain.equals(url.getHost())) {
-                return true;
-            }
-        } catch (MalformedURLException e) {
-            Log.e("StickerPackValidator", "url: " + urlString + " is malformed");
-            throw new IllegalStateException("url: " + urlString + " is malformed");
-        }
-        return false;
-    }
 }
