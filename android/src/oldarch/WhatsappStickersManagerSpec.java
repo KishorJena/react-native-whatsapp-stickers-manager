@@ -36,4 +36,6 @@ abstract class WhatsappStickersManagerSpec extends ReactContextBaseJavaModule {
   public abstract void addPackToWhatsApp(int identifier, String name, Promise promise);
 
   public abstract void isPackAddedToWhatsApp(int identifier, ReadableArray includeExtraPackages, Promise promise);
+  public abstract void validatePack(ReadableMap stickerPack, Promise promise);
+
 }

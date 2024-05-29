@@ -1,5 +1,6 @@
 package com.whatsappstickersmanager;
 
+import static com.whatsappstickersmanager.Const.Pack.COL_ANIMATED;
 import static com.whatsappstickersmanager.Const.Pack.COL_IDENTIFIER;
 import static com.whatsappstickersmanager.Const.Pack.COL_STICKERS;
 import static com.whatsappstickersmanager.Const.Pack.COL_TRAY;
@@ -28,6 +29,7 @@ import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeMap;
 import com.whatsappstickersmanager.database.PackDAO;
 import com.whatsappstickersmanager.database.StickerDAO;
+import com.whatsappstickersmanager.database.StickerPackDAO;
 
 import java.io.File;
 import java.util.HashMap;
@@ -292,6 +294,25 @@ public class WhatsappStickersManagerModule extends com.whatsappstickersmanager.W
     }
   }
 
+  @ReactMethod
+  public void validatePack(ReadableMap stickerPack, Promise promise){
+    WritableArray result = Arguments.createArray();
+
+    try{
+      ReadableArray stickers = stickerPack.getArray(COL_STICKERS);
+      for ( int i = 0; i < stickers.size(); i++){
+        ReadableMap sticker = stickers.getMap(i);
+        String imageFileName = sticker.getString(COL_IMAGE_FILE);
+//        WritableMap stickerResult = StickerPackValidator.validateStickerFile(imageFileName, stickerPack.getBoolean(COL_ANIMATED));
+        result.pushString(imageFileName);
+//        result.pushMap(stickerResult);
+      }
+      promise.resolve(result);
+    }catch (Exception e){
+      promise.reject(e);
+    }
+
+  }
   ////// Handle Activity Result for Adding Sticker to Whatsapppack //////
   @Override
   public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent intent) {
