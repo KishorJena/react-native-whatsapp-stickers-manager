@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -82,6 +83,19 @@ public class FileActions {
                 deleteDirectory(directory);
             }
         }
+    }
+
+    public static byte[] toByteArray(String path) throws IOException {
+        File imageFile = new File(path.replaceFirst("file://",""));
+        FileInputStream fileInputStream = new FileInputStream(imageFile);
+        byte[] imageData = new byte[1024];
+        int bytesRead;
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        while ((bytesRead = fileInputStream.read(imageData)) != -1) {
+            bos.write(imageData, 0, bytesRead);
+        }
+        fileInputStream.close();
+        return bos.toByteArray();
     }
 
 }

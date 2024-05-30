@@ -295,20 +295,36 @@ public class WhatsappStickersManagerModule extends com.whatsappstickersmanager.W
 
   @ReactMethod
   public void validatePack(ReadableMap stickerPack, Promise promise){
-    WritableArray result = Arguments.createArray();
+    // read input
+    ReadableArray stickers = stickerPack.getArray(COL_STICKERS);
+    String trayIconPath = stickerPack.getString(COL_TRAY);
+    boolean isAnimatedPack = stickerPack.getBoolean(COL_ANIMATED);
+    // result cotainer
+    WritableMap result = new WritableNativeMap();
 
     try{
-      ReadableArray stickers = stickerPack.getArray(COL_STICKERS);
+      // 1. validate tray
+      WritableMap trayResult = StickerPackValidator.validateTrayIconFile(trayIconPath);
+      // 2. validate stickers
+      WritableArray stickersResult = Arguments.createArray();
       for ( int i = 0; i < stickers.size(); i++){
         ReadableMap sticker = stickers.getMap(i);
         String imageFileName = sticker.getString(COL_IMAGE_FILE);
-//        WritableMap stickerResult = StickerPackValidator.validateStaticFile(imageFileName, stickerPack.getBoolean(COL_ANIMATED));
-        WritableMap stickerResult = StickerPackValidator.validateAnimatedStickerFil(imageFileName, stickerPack.getBoolean(COL_ANIMATED));
-//        result.pushString(imageFileName);
-        result.pushMap(stickerResult);
+        WritableMap stickerResult;
+        if(isAnimatedPack){
+          stickerResult = StickerPackValidator.validateAnimatedStickerFil(imageFileName, stickerPack.getBoolean(COL_ANIMATED));
+        }else{
+          stickerResult = StickerPackValidator.validateStaticFile(imageFileName, stickerPack.getBoolean(COL_ANIMATED));
+        }
+        stickersResult.pushMap(stickerResult);
       }
+      // 3. put result -> result container
+      result.putMap("trayIcon",trayResult);
+      result.putArray("stickers",stickersResult);
+      // resolve
       promise.resolve(result);
     }catch (Exception e){
+      // reject
       promise.reject(e);
     }
 
