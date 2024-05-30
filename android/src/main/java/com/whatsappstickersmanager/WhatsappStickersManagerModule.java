@@ -29,7 +29,6 @@ import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeMap;
 import com.whatsappstickersmanager.database.PackDAO;
 import com.whatsappstickersmanager.database.StickerDAO;
-import com.whatsappstickersmanager.database.StickerPackDAO;
 
 import java.io.File;
 import java.util.HashMap;
@@ -303,7 +302,8 @@ public class WhatsappStickersManagerModule extends com.whatsappstickersmanager.W
       for ( int i = 0; i < stickers.size(); i++){
         ReadableMap sticker = stickers.getMap(i);
         String imageFileName = sticker.getString(COL_IMAGE_FILE);
-        WritableMap stickerResult = StickerPackValidator.validateStickerFile(imageFileName, stickerPack.getBoolean(COL_ANIMATED));
+//        WritableMap stickerResult = StickerPackValidator.validateStaticFile(imageFileName, stickerPack.getBoolean(COL_ANIMATED));
+        WritableMap stickerResult = StickerPackValidator.validateAnimatedStickerFil(imageFileName, stickerPack.getBoolean(COL_ANIMATED));
 //        result.pushString(imageFileName);
         result.pushMap(stickerResult);
       }

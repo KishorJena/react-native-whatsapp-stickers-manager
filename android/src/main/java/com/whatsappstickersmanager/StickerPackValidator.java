@@ -1,17 +1,10 @@
 package com.whatsappstickersmanager;
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.text.TextUtils;
-import android.util.Log;
-import android.util.Patterns;
-import android.webkit.URLUtil;
-
 import androidx.annotation.NonNull;
 
 import com.facebook.animated.webp.WebPImage;
 import com.facebook.imagepipeline.common.ImageDecodeOptions;
+import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeArray;
@@ -21,10 +14,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.util.List;
 
 class StickerPackValidator {
     private static final int STATIC_STICKER_FILE_LIMIT_KB = 100;
@@ -59,143 +48,118 @@ class StickerPackValidator {
         return bos.toByteArray();
     }
 
-    static WritableMap validateStickerFile(final String filePath, final boolean animatedStickerPack) throws IllegalStateException {
+    static WritableMap validateStaticFile(final String filePath, final boolean animatedStickerPack) throws IllegalStateException {
         WritableMap result = new WritableNativeMap();
         result.putString("filePath", filePath);
 
-        // overall validation
-        boolean isValidSticker = false;
         try {
+            WritableMap report = new WritableNativeMap();
+
             final byte[] stickerInBytes = toByteArray(filePath);
+            int size = (int) (stickerInBytes.length / KB_IN_BYTES);
+            report.putInt("size", size);
 
-            // 1. FILE SIZE
-            WritableMap fileSIze = new WritableNativeMap();
-            int currentSize = (int) (stickerInBytes.length / KB_IN_BYTES);
-            fileSIze.putInt("currentSize", currentSize);
-            fileSIze.putInt("maxRequiredSize", STATIC_STICKER_FILE_LIMIT_KB);
-            boolean validFileSize = stickerInBytes.length <= STATIC_STICKER_FILE_LIMIT_KB * KB_IN_BYTES;
-            fileSIze.putBoolean("valid", validFileSize);
-            result.putMap("fileSize",fileSIze);
-
-            // 2. FILE HEIGHT
             final WebPImage webPImage = WebPImage.createFromByteArray(stickerInBytes, ImageDecodeOptions.defaults());
-            WritableMap mapHeight = new WritableNativeMap();
-            mapHeight.putInt("actualHeight", webPImage.getHeight());
-            mapHeight.putInt("requiredHeight", IMAGE_HEIGHT);
+
+            int height = webPImage.getHeight();
+            report.putInt("height", height);
+            int width = webPImage.getWidth();
+            report.putInt("width", width);
+            int frameCount = webPImage.getFrameCount();
+            report.putInt("frameCount", frameCount);
+            boolean animatedSticker = frameCount > 1;
+            report.putBoolean("animatedSticker", animatedSticker);
+
+            boolean validSize = stickerInBytes.length <= STATIC_STICKER_FILE_LIMIT_KB * KB_IN_BYTES;
             boolean validHeight = webPImage.getHeight() == IMAGE_HEIGHT;
-            mapHeight.putBoolean("valid",validHeight);
-            result.putMap("height",mapHeight);
-
-            // 3. FILE WIDTH
-            WritableMap mapWidth = new WritableNativeMap();
-            mapWidth.putInt("actualWidth", webPImage.getWidth());
-            mapWidth.putInt("requiredWidth", IMAGE_WIDTH);
             boolean validWidth = webPImage.getWidth() == IMAGE_WIDTH;
-            mapWidth.putBoolean("valid",validWidth);
-            result.putMap("width",mapWidth);
+            boolean validFrameCount = !(webPImage.getFrameCount() > 1);
+            boolean validStickerTyep = animatedSticker == animatedStickerPack ;
 
-            WritableMap mapFrameCount = new WritableNativeMap();
-            mapFrameCount.putInt("actualFrameCount", webPImage.getFrameCount());
-            mapFrameCount.putInt("requiredFrameCount", 1);
-            boolean validFrameCount = webPImage.getFrameCount() <= 1;
-            mapFrameCount.putBoolean("valid",validFrameCount);
-            result.putMap("isAnimated",mapFrameCount);
+            boolean validSticker = validSize && validHeight && validWidth && validFrameCount && validStickerTyep;
+            result.putMap("report", report);
 
-            result.putBoolean("validFile", true);
-
-            isValidSticker = validFileSize && validHeight && validWidth && validFrameCount;
-            result.putBoolean("isValidSticker",isValidSticker);
-        } catch (IOException e) {
-            result.putBoolean("validFile", false);
+            result.putBoolean("validSticker", validSticker);
+            return result;
+        } catch (Exception e) {
+            throw new RuntimeException("Error reading file in validateStaticFile: ",e);
         }
-        return result;
+
     }
 
-    static WritableMap validateStickerFileAnim(final String filePath, final boolean animatedStickerPack) throws IllegalStateException {
+    static WritableMap validateAnimatedStickerFil(final String filePath, final boolean animatedStickerPack) throws IllegalStateException {
         WritableMap result = new WritableNativeMap();
         try {
+            WritableMap report = new WritableNativeMap();
+
             final byte[] stickerInBytes = toByteArray(filePath);
-            if (!animatedStickerPack && stickerInBytes.length > STATIC_STICKER_FILE_LIMIT_KB * KB_IN_BYTES) {
-                int currentSize = (int) (stickerInBytes.length / KB_IN_BYTES);
-                WritableMap map = new WritableNativeMap();
-                result.putInt("currentSize", currentSize);
-                result.putInt("limitSize", STATIC_STICKER_FILE_LIMIT_KB);
-//                throw new IllegalStateException("static sticker should be less than " + STATIC_STICKER_FILE_LIMIT_KB + "KB, current file is " + stickerInBytes.length / KB_IN_BYTES + " KB, sticker pack identifier: " + identifier + ", filename: " + fileName);
-            }
-            if (animatedStickerPack && stickerInBytes.length > ANIMATED_STICKER_FILE_LIMIT_KB * KB_IN_BYTES) {
-                int currentSize = (int) (stickerInBytes.length / KB_IN_BYTES);
-                WritableMap map = new WritableNativeMap();
-                map.putInt("currentSize",currentSize);
-                map.putInt("limitSize", ANIMATED_STICKER_FILE_LIMIT_KB);
-                result.putMap("fileSizeError", map);
-//                throw new IllegalStateException("animated sticker should be less than " + ANIMATED_STICKER_FILE_LIMIT_KB + "KB, current file is " + stickerInBytes.length / KB_IN_BYTES + " KB, sticker pack identifier: " + identifier + ", filename: " + fileName);
-            }
-            try {
-                final WebPImage webPImage = WebPImage.createFromByteArray(stickerInBytes, ImageDecodeOptions.defaults());
-                if (webPImage.getHeight() != IMAGE_HEIGHT) {
-                    WritableMap map = new WritableNativeMap();
-                    int currentHeight = webPImage.getHeight();
-                    map.putInt("currentHeight", currentHeight);
-                    map.putInt("requiredHeight", IMAGE_HEIGHT);
-                    result.putMap("fileSizeError", map);
-//                    throw new IllegalStateException("sticker height should be " + IMAGE_HEIGHT + ", current height is " + webPImage.getHeight() + ", sticker pack identifier: " + identifier + ", filename: " + fileName);
-                }
-                if (webPImage.getWidth() != IMAGE_WIDTH) {
-                    WritableMap map = new WritableNativeMap();
-                    int currentWidth = webPImage.getWidth();
-                    map.putInt("currentWidth", currentWidth);
-                    map.putInt("requiredWidth", IMAGE_WIDTH);
-                    result.putMap("fileSizeError", map);
-//                    throw new IllegalStateException("sticker width should be " + IMAGE_WIDTH + ", current width is " + webPImage.getWidth() + ", sticker pack identifier: " + identifier + ", filename: " + fileName);
-                }
-                if (animatedStickerPack) {
-                    if (webPImage.getFrameCount() <= 1) {
-                        WritableMap map = new WritableNativeMap();
-                        map.putInt("frameCount", webPImage.getFrameCount());
-                        result.putMap("frameCountError", map);
-//                        throw new IllegalStateException("this pack is marked as animated sticker pack, all stickers should animate, sticker pack identifier: " + identifier + ", filename: " + fileName);
-                    }
-//                    checkFrameDurationsForAnimatedSticker(webPImage.getFrameDurations(), identifier, fileName);
-                    if (webPImage.getDuration() > ANIMATED_STICKER_TOTAL_DURATION_MAX) {
-                        WritableMap map = new WritableNativeMap();
-                        map.putInt("duration", webPImage.getDuration());
-                        result.putMap("durationError", map);
-//                        throw new IllegalStateException("sticker animation max duration is: " + ANIMATED_STICKER_TOTAL_DURATION_MAX + " ms, current duration is: " + webPImage.getDuration() + " ms, sticker pack identifier: " + identifier + ", filename: " + fileName);
-                    }
-                } else if (webPImage.getFrameCount() > 1) {
-                    WritableMap map = new WritableNativeMap();
-                    map.putInt("frameCount", webPImage.getFrameCount());
-                    result.putMap("frameCountError", map);
-//                    throw new IllegalStateException("this pack is not marked as animated sticker pack, all stickers should be static stickers, sticker pack identifier: " + identifier + ", filename: " + fileName);
-                }
-            } catch (IllegalArgumentException e) {
-                WritableMap map = new WritableNativeMap();
-                map.putString("message", e.getMessage());
-                result.putMap("imageTypeError", map);
 
-//                throw new IllegalStateException("Error parsing webp image, sticker pack identifier: " + identifier + ", filename: " + fileName, e);
-            }
+            // 1. size
+            int size = (int) (stickerInBytes.length / KB_IN_BYTES);
+            report.putInt("size", size);
+
+            final WebPImage webPImage = WebPImage.createFromByteArray(stickerInBytes, ImageDecodeOptions.defaults());
+
+            // 2 Height
+            int height = webPImage.getHeight();
+            report.putInt("height", height);
+
+            // 3.width
+            int width = webPImage.getWidth();
+            report.putInt("width", width);
+
+            // 4. frameCount
+            int frameCount = webPImage.getFrameCount();
+            report.putInt("frameCount", frameCount);
+
+            // 5. total Duration
+            int totalDuration = webPImage.getDuration();
+            report.putInt("totalDuration", totalDuration);
+
+            // 6. animatedSticker
+            boolean animatedSticker = frameCount > 1;
+            report.putBoolean("animatedSticker", animatedSticker);
+
+            // 7. frame Duration
+            WritableMap frameDuration = checkFrameDurationsForAnimatedSticker(webPImage.getFrameDurations());
+            ReadableArray invalidDurationIndexes = frameDuration.getArray("invalidDurationIndexes");
+            ReadableArray durationsArray =  frameDuration.getArray("durationsArray");
+            report.putArray("invalidDelaysIndexes",invalidDurationIndexes);
+            report.putArray("framesDelay",durationsArray);
+
+            boolean validSize = !(stickerInBytes.length > ANIMATED_STICKER_FILE_LIMIT_KB * KB_IN_BYTES);
+            boolean validHeight = webPImage.getHeight() == IMAGE_HEIGHT;
+            boolean validWidth = webPImage.getWidth() == IMAGE_WIDTH;
+            boolean validDuration = !(webPImage.getDuration() > ANIMATED_STICKER_TOTAL_DURATION_MAX);
+            boolean validFrameCount = !(webPImage.getFrameCount() <= 1);
+            boolean validStickerTyep = animatedSticker == animatedStickerPack ;
+            boolean validSticker = validSize && validHeight && validWidth && validFrameCount && validStickerTyep && validDuration;
+
+
+            result.putMap("report", report);
+
+            result.putBoolean("validSticker", validSticker);
+
         } catch (IOException e) {
-            WritableMap map = new WritableNativeMap();
-            map.putString("message", e.getMessage());
-            result.putMap("imageFileReadingError", map);
-
-//            throw new IllegalStateException("cannot open sticker file: sticker pack identifier: " + identifier + ", filename: " + fileName, e);
+            throw new RuntimeException("Error reading file in validateStickerFileAnim: ",e);
         }
         return result;
     }
 
-    private static void checkFrameDurationsForAnimatedSticker(@NonNull final int[] frameDurations, @NonNull final String identifier, @NonNull final String fileName) {
-        WritableArray array = new WritableNativeArray();
-        for (int frameDuration : frameDurations) {
+    private static WritableMap checkFrameDurationsForAnimatedSticker(@NonNull final int[] frameDurations) {
+        WritableMap duration = new WritableNativeMap();
+        WritableArray durationsArray = new WritableNativeArray();
+        WritableArray invalidDurationsArray = new WritableNativeArray();
+        for (int i = 0; i < frameDurations.length; i++) {
+            int frameDuration = frameDurations[i];
+            durationsArray.pushInt(frameDuration);
             if (frameDuration < ANIMATED_STICKER_FRAME_DURATION_MIN) {
-                WritableMap map = new WritableNativeMap();
-                map.putInt("frameDuration", frameDuration);
-                map.putString("fileName", fileName);
-                array.pushMap(map);
-//                throw new IllegalStateException("animated sticker frame duration limit is " + ANIMATED_STICKER_FRAME_DURATION_MIN + ", sticker pack identifier: " + identifier + ", filename: " + fileName);
+                invalidDurationsArray.pushInt(i);
             }
         }
+        duration.putArray("durationsArray",durationsArray);
+        duration.putArray("invalidIndexes",invalidDurationsArray);
+        return duration;
     }
 
 }
