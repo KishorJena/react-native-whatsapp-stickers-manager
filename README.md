@@ -198,8 +198,9 @@ Alert Boxes which returns the response result from WhatsApp:
 <img src="https://imgur.com/mv1bYzb.png" height="80"  /> <img src="https://imgur.com/60HPBjW.png" height="80"  /> <img src="https://imgur.com/tmYsdYP.png" height="80"  />
 
 ❕❗For more information on the response object and its properties, see the [Response Object Details section](#Response-Object-Details)
-### 1.7 Check if a Sticker Pack is Added to WhatsApp
 
+### 1.7 Check if a Sticker Pack is Added to WhatsApp
+It checks if sticker pack is added to Whatsapp Consumer and WhatsApp Buisness app. Good thing is that it returns separet informations for each. You can add packages other than these 2 official whatsapp packages. Pass the package names of the apps to  ```includeExtraPackages``` or leave simply do not include this field if you want only whitelist result of official apps.
 ```js
 // Check if a sticker pack is added to WhatsApp with an optional filter
 await RNWSManager.Pack.isPackAddedToWhatsApp({
