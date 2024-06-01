@@ -168,6 +168,10 @@ function isPackAddedToWhatsApp(option: {
   );
 }
 
+function validatePack(option): Promise<any> {
+  return WhatsappStickersManager.validateImageFiles(option);
+}
+
 export const Pack = {
   createPack,
   deletePack,
@@ -178,6 +182,7 @@ export const Pack = {
   updateTrayIcon,
   isPackAddedToWhatsApp,
   addPackToWhatsApp,
+  validatePack
 };
 
 export const Sticker = {

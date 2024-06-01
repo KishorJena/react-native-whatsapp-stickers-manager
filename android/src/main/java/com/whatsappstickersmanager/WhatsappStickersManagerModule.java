@@ -294,7 +294,7 @@ public class WhatsappStickersManagerModule extends com.whatsappstickersmanager.W
   }
 
   @ReactMethod
-  public void validatePack(ReadableMap stickerPack, Promise promise){
+  public void validateImageFiles(ReadableMap stickerPack, Promise promise){
     // read input
     ReadableArray stickers = stickerPack.getArray(COL_STICKERS);
     String trayIconPath = stickerPack.getString(COL_TRAY);
